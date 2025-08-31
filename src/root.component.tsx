@@ -1,15 +1,20 @@
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
+import { GeneralComponent } from "saltbox-gateway/general-сomponent";
+import "@saltbox/saltbox-frontend-common/dist/saltbox-frontend-common.css";
 
 export default function Root(props) {
   return (
     <BrowserRouter basename="/gate">
       <Routes>
-        <Route path="/" element={<TestComponent />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <GeneralComponent />
+            </>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
 }
-
-const TestComponent = () => {
-  return <>asd</>;
-};

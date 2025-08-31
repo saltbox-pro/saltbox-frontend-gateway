@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOMClient from "react-dom/client";
 import singleSpaReact from "single-spa-react";
 import Root from "./root.component";
+import { appStore, envStore } from "saltbox-gateway/store";
+import { runInAction } from "mobx";
 
 const lifecycles = singleSpaReact({
   React,
@@ -26,13 +28,14 @@ export const meta = {
       },
     ],
   },
-  // init: (authStore, env, localeStore) => {
-  //   appStore.init(authStore);
-  //   runInAction(() => {
-  //     envStore.env = env;
-  //   });
-  //   autorun(() => {
-  //     i18nStore.currentLanguage = localeStore.currentLocale;
-  //   });
-  // },
+  init: (authStore, env, localeStore) => {
+    appStore.init(authStore);
+    runInAction(() => {
+      envStore.env = env;
+    });
+    // autorun(() => {
+    //   let i18nStore;
+    //   i18nStore.currentLanguage = localeStore.currentLocale;
+    // });
+  },
 };

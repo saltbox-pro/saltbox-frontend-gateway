@@ -1,10 +1,23 @@
 {
-  "extends": "ts-config-single-spa",
   "compilerOptions": {
+    "target": "es2022",
+    "lib": [
+      "es2022",
+      "dom"
+    ],
     "jsx": "react-jsx",
-    "declarationDir": "dist"
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "declaration": true,
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "paths": {
+      "saltbox-gateway/*": [
+        "src/*"
+      ],
+    }
   },
-  "files": ["src/saltbox-frontend-gate.tsx"],
-  "include": ["src/**/*"],
-  "exclude": ["src/**/*.test*"]
+  "include": [
+    "src/**/*"
+  ]
 }

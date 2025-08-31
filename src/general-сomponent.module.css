@@ -1,0 +1,50 @@
+.card {
+  width: 100%;
+}
+.card :global(.ant-card-body) {
+    padding: 0;
+}
+.card :global(.ant-card-body) :global(.ant-descriptions-view) {
+    border: none;
+    border-radius: 0;
+}
+.card :global(.ant-card-body) :global(.ant-descriptions-view) th {
+    border-start-start-radius: 0!important;
+}
+.cardTitle {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+.cardTitleHeader {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: baseline;
+}
+
+.cardTitleText {
+   margin-top: 8px;
+}
+
+.cardDescription {
+  font-weight: normal;
+  margin: 0;
+}
+
+.cardContent {
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.noBorder {
+  border: none;
+}
+
+.instancesHeader {
+  margin-top: 24px;
+}
