@@ -4,7 +4,7 @@ import "@saltbox/saltbox-frontend-common/dist/saltbox-frontend-common.css";
 
 export default function Root(props) {
   return (
-    <BrowserRouter basename="/gate">
+    <BrowserRouter basename="/gateway">
       <Routes>
         <Route
           path="/"

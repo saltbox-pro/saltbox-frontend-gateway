@@ -1,5 +1,5 @@
 {
-  "name": "saltbox-frontend-gate",
+  "name": "saltbox-frontend-gateway",
   "version": "0.0.1",
   "license": "Apache-2.0",
   "scripts": {

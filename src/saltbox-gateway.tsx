@@ -16,15 +16,15 @@ export const { bootstrap, mount, unmount } = lifecycles;
 
 export const meta = {
   name: "saltbox-frontend-gate",
-  path: "/gate",
+  path: "/gateway",
   settingsConfig: {
-    key: "gate",
-    label: "Gate",
+    key: "gateway",
+    label: "Gateway",
     children: [
       {
         key: "general",
         label: { en: "General", ru: "Основное" },
-        path: "/gate",
+        path: "/gateway",
       },
     ],
   },

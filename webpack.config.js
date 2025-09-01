@@ -6,7 +6,7 @@ const path = require("path");
 module.exports = (webpackConfigEnv, argv) => {
   const defaultConfig = singleSpaDefaults({
     orgName: "saltbox",
-    projectName: "gate",
+    projectName: "gateway",
     webpackConfigEnv,
     argv,
     outputSystemJS: false,
