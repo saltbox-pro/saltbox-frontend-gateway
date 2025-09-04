@@ -22,6 +22,9 @@ module.exports = (webpackConfigEnv, argv) => {
       },
     },
     plugins: [
+      new CopyPlugin({
+        patterns: [{ from: "public/locales", to: "locales" }],
+      }),
       new webpack.DefinePlugin({
         DEVELOPMENT: argv.mode === "development",
         PRODUCTION: argv.mode === "production",

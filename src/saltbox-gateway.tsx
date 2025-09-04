@@ -3,7 +3,8 @@ import ReactDOMClient from "react-dom/client";
 import singleSpaReact from "single-spa-react";
 import Root from "./root.component";
 import { appStore, envStore } from "saltbox-gateway/store";
-import { runInAction } from "mobx";
+import { autorun, runInAction } from "mobx";
+import { i18nStore } from "saltbox-gateway/store/i18n-store";
 
 const lifecycles = singleSpaReact({
   React,
@@ -12,9 +13,8 @@ const lifecycles = singleSpaReact({
   domElementGetter: () => document.getElementById("app-container"),
 });
 
-export const { bootstrap, mount, unmount } = lifecycles;
-
-export const meta = {
+export const saltboxModule = {
+  singleSpaLifecycle: lifecycles,
   name: "saltbox-frontend-gate",
   path: "/gateway",
   settingsConfig: {
@@ -33,9 +33,8 @@ export const meta = {
     runInAction(() => {
       envStore.env = env;
     });
-    // autorun(() => {
-    //   let i18nStore;
-    //   i18nStore.currentLanguage = localeStore.currentLocale;
-    // });
+    autorun(() => {
+      i18nStore.currentLanguage = localeStore.currentLocale;
+    });
   },
 };

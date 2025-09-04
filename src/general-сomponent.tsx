@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-// @ts-ignore
 import styles from "./general-сomponent.module.css";
 import {
   ServiceInstanceOutput,
@@ -19,6 +18,7 @@ import {
 } from "antd";
 import { PageHeader } from "@saltbox/saltbox-frontend-common";
 import { HomeOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const getServiceStatus = (
   instances: ServiceInstanceOutput[]
@@ -37,6 +37,7 @@ const getServiceStatus = (
 };
 export const GeneralComponent = () => {
   const [services, setServices] = useState<ServiceSchemaOutput[]>([]);
+  const { t } = useTranslation();
   const [isServicesLoading, setIsServicesLoading] = useState(true);
   const [selectedService, setSelectedService] =
     useState<ServiceSchemaOutput | null>(null);
@@ -61,11 +62,11 @@ export const GeneralComponent = () => {
             title: <HomeOutlined />,
           },
           {
-            title: "General",
+            title: t("general.title"),
           },
         ]}
       />
-      <PageHeader title="General"></PageHeader>
+      <PageHeader title={t("general.title")}></PageHeader>
       <div className={styles.container}>
         <List
           loading={isServicesLoading}

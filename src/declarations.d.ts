@@ -42,3 +42,6 @@ declare module "*.module.css" {
   const classes: { [key: string]: string };
   export default classes;
 }
+
+declare const DEVELOPMENT: boolean;
+declare const PRODUCTION: boolean;
