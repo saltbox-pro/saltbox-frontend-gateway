@@ -2,6 +2,7 @@ const { merge } = require("webpack-merge");
 const webpack = require("webpack");
 const singleSpaDefaults = require("webpack-config-single-spa-react-ts");
 const path = require("path");
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = (webpackConfigEnv, argv) => {
   const defaultConfig = singleSpaDefaults({

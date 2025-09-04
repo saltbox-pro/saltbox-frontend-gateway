@@ -118,13 +118,13 @@ export const GeneralComponent = () => {
                     className={styles.noBorder}
                     contentStyle={{ textAlign: "right" }}
                   >
-                    <Descriptions.Item label="Vendor">
+                    <Descriptions.Item label={t("general.vendor")}>
                       {service.vendor}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Type">
+                    <Descriptions.Item label={t("general.type")}>
                       {service.type}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Instances">
+                    <Descriptions.Item label={t("general.instances")}>
                       {service.instances?.length || 0}
                     </Descriptions.Item>
                   </Descriptions>
@@ -136,29 +136,35 @@ export const GeneralComponent = () => {
 
         {selectedService && (
           <Modal
-            title={`Service: ${selectedService.title || selectedService.name}`}
+            title={t("general.serviceTitle", {
+              name: selectedService.title || selectedService.name,
+            })}
             open={!!selectedService}
             onCancel={() => setSelectedService(null)}
             footer={null}
             width={900}
           >
             <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label="Vendor">
+              <Descriptions.Item label={t("general.vendor")}>
                 {selectedService.vendor}
               </Descriptions.Item>
-              <Descriptions.Item label="Type">
+              <Descriptions.Item label={t("general.type")}>
                 {selectedService.type}
               </Descriptions.Item>
               {selectedService.enabled !== undefined && (
-                <Descriptions.Item label="Enabled">
+                <Descriptions.Item label={t("general.enabled")}>
                   <Tag color={selectedService.enabled ? "blue" : "grey"}>
-                    {selectedService.enabled ? "Enabled" : "Disabled"}
+                    {selectedService.enabled
+                      ? t("general.enabled")
+                      : t("general.disabled")}
                   </Tag>
                 </Descriptions.Item>
               )}
             </Descriptions>
             <h4 className={styles.instancesHeader}>
-              Instances ({selectedService.instances?.length || 0})
+              {t("general.instancesCount", {
+                count: selectedService.instances?.length || 0,
+              })}
             </h4>
             <List
               dataSource={selectedService.instances}
@@ -169,20 +175,26 @@ export const GeneralComponent = () => {
                       type="link"
                       onClick={() => setSelectedInstance(instance)}
                     >
-                      Details
+                      {t("general.details")}
                     </Button>,
                   ]}
                 >
                   <List.Item.Meta
                     title={`${instance.host}:${instance.port}`}
-                    description={`Version: ${instance.version || "N/A"}`}
+                    description={t("general.versionWithValue", {
+                      version: instance.version || t("general.na"),
+                    })}
                   />
                   <div>
                     <Tag color={instance.healthy ? "green" : "red"}>
-                      {instance.healthy ? "Healthy" : "Unhealthy"}
+                      {instance.healthy
+                        ? t("general.healthy")
+                        : t("general.unhealthy")}
                     </Tag>
                     <Tag color={instance.enabled ? "blue" : "grey"}>
-                      {instance.enabled ? "Enabled" : "Disabled"}
+                      {instance.enabled
+                        ? t("general.enabled")
+                        : t("general.disabled")}
                     </Tag>
                   </div>
                 </List.Item>
@@ -193,42 +205,42 @@ export const GeneralComponent = () => {
 
         {selectedInstance && (
           <Modal
-            title={`Instance: ${selectedInstance.id}`}
+            title={t("general.instanceTitle", { id: selectedInstance.id })}
             open={!!selectedInstance}
             onCancel={() => setSelectedInstance(null)}
             footer={null}
             width={700}
           >
             <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label="ID">
+              <Descriptions.Item label={t("general.id")}>
                 {selectedInstance.id}
               </Descriptions.Item>
-              <Descriptions.Item label="Host">
+              <Descriptions.Item label={t("general.host")}>
                 {selectedInstance.host}
               </Descriptions.Item>
-              <Descriptions.Item label="Port">
+              <Descriptions.Item label={t("general.port")}>
                 {selectedInstance.port}
               </Descriptions.Item>
               {selectedInstance.version && (
-                <Descriptions.Item label="Version">
+                <Descriptions.Item label={t("general.version")}>
                   {selectedInstance.version}
                 </Descriptions.Item>
               )}
               {selectedInstance.last_check && (
-                <Descriptions.Item label="Last Check">
+                <Descriptions.Item label={t("general.lastCheck")}>
                   {new Date(
                     selectedInstance.last_check * 1000
                   ).toLocaleString()}
                 </Descriptions.Item>
               )}
               {selectedInstance.last_healthy && (
-                <Descriptions.Item label="Last Healthy">
+                <Descriptions.Item label={t("general.lastHealthy")}>
                   {new Date(
                     selectedInstance.last_healthy * 1000
                   ).toLocaleString()}
                 </Descriptions.Item>
               )}
-              <Descriptions.Item label="Endpoints">
+              <Descriptions.Item label={t("general.endpoints")}>
                 {selectedInstance.endpoints?.length || 0}
               </Descriptions.Item>
             </Descriptions>

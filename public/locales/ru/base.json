@@ -1,5 +1,25 @@
 {
   "general": {
-    "title": "Основное"
+    "title": "Основное",
+    "vendor": "Разработчик",
+    "type": "Тип",
+    "instances": "Экземпляры",
+    "serviceTitle": "Сервис: {{name}}",
+    "enabled": "Включено",
+    "disabled": "Выключено",
+    "instancesCount": "Экземпляры ({{count}})",
+    "details": "Подробнее",
+    "version": "Версия",
+    "versionWithValue": "Версия: {{version}}",
+    "healthy": "Здоров",
+    "unhealthy": "Не здоров",
+    "instanceTitle": "Экземпляр: {{id}}",
+    "id": "ID",
+    "host": "Хост",
+    "port": "Порт",
+    "lastCheck": "Последняя проверка",
+    "lastHealthy": "Последняя успешная проверка",
+    "endpoints": "Конечные точки",
+    "na": "Н/Д"
   }
 }

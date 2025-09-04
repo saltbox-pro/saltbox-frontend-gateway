@@ -1,5 +1,25 @@
 {
   "general": {
-    "title": "General"
+    "title": "General",
+    "vendor": "Vendor",
+    "type": "Type",
+    "instances": "Instances",
+    "serviceTitle": "Service: {{name}}",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "instancesCount": "Instances ({{count}})",
+    "details": "Details",
+    "version": "Version",
+    "versionWithValue": "Version: {{version}}",
+    "healthy": "Healthy",
+    "unhealthy": "Unhealthy",
+    "instanceTitle": "Instance: {{id}}",
+    "id": "ID",
+    "host": "Host",
+    "port": "Port",
+    "lastCheck": "Last Check",
+    "lastHealthy": "Last Healthy",
+    "endpoints": "Endpoints",
+    "na": "N/A"
   }
 }
