@@ -11,13 +11,16 @@ import {
   Button,
   Card,
   Descriptions,
+  Dropdown,
   List,
+  MenuProps,
   Modal,
+  Popconfirm,
   Tag,
   Typography,
 } from "antd";
 import { PageHeader } from "@saltbox/saltbox-frontend-common";
-import { HomeOutlined } from "@ant-design/icons";
+import { HomeOutlined, MoreOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
 const getServiceStatus = (
@@ -43,18 +46,109 @@ export const GeneralComponent = () => {
     useState<ServiceSchemaOutput | null>(null);
   const [selectedInstance, setSelectedInstance] =
     useState<ServiceInstanceOutput | null>(null);
+  const [modal, contextHolder] = Modal.useModal();
 
-  useEffect(() => {
+  const fetchServices = () => {
+    setIsServicesLoading(true);
     apiGatewayStore.discoveryApi
       .getServicesApiDiscoveryServicesGet()
       .then((serv) => {
-        setIsServicesLoading(false);
         setServices(serv);
+      })
+      .finally(() => {
+        setIsServicesLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchServices();
   }, []);
+
+  const deleteService = () => {
+    if (!selectedService) return;
+    apiGatewayStore.discoveryApi
+      .removeServiceApiDiscoveryUnregisterServiceNameDelete({
+        service_name: selectedService.name,
+      })
+      .then(() => {
+        setSelectedService(null);
+        fetchServices();
+      });
+  };
+
+  const toggleService = () => {
+    if (!selectedService) return;
+    apiGatewayStore.discoveryApi
+      .enableDisableServiceApiDiscoveryServicesServiceNameTogglePost({
+        service_name: selectedService.name,
+        BodyEnableDisableServiceApiDiscoveryServicesServiceNameTogglePost: {
+          enabled: !selectedService.enabled,
+        },
+      })
+      .then(() => {
+        setSelectedService(null);
+        fetchServices();
+      });
+  };
+
+  const deleteInstance = (instanceId: string) => {
+    if (!selectedService) return;
+    apiGatewayStore.discoveryApi
+      .removeInstanceApiDiscoveryUnregisterServiceNameInstanceIdDelete({
+        service_name: selectedService.name,
+        instance_id: instanceId,
+      })
+      .then(() => {
+        setSelectedService(null);
+        fetchServices();
+      });
+  };
+
+  const serviceActionItems: MenuProps["items"] = [
+    {
+      key: "toggle",
+      label: selectedService?.enabled
+        ? t("general.disable")
+        : t("general.enable"),
+      onClick: () => {
+        modal.confirm({
+          title: selectedService?.enabled
+            ? t("general.disableService")
+            : t("general.enableService"),
+          content: selectedService?.enabled
+            ? t("general.areYouSureDisableService")
+            : t("general.areYouSureEnableService"),
+          okText: t("general.yes"),
+          okType: "danger",
+          cancelText: t("general.no"),
+          onOk() {
+            toggleService();
+          },
+        });
+      },
+    },
+    {
+      key: "delete",
+      label: t("general.delete"),
+      danger: true,
+      onClick: () => {
+        modal.confirm({
+          title: t("general.deleteService"),
+          content: t("general.areYouSureDeleteService"),
+          okText: t("general.yes"),
+          okType: "danger",
+          cancelText: t("general.no"),
+          onOk() {
+            deleteService();
+          },
+        });
+      },
+    },
+  ];
 
   return (
     <>
+      {contextHolder}
       <Breadcrumb
         items={[
           {
@@ -116,7 +210,7 @@ export const GeneralComponent = () => {
                     column={1}
                     size="small"
                     className={styles.noBorder}
-                    contentStyle={{ textAlign: "right" }}
+                    styles={{ content: { textAlign: "right" } }}
                   >
                     <Descriptions.Item label={t("general.vendor")}>
                       {service.vendor}
@@ -141,7 +235,11 @@ export const GeneralComponent = () => {
             })}
             open={!!selectedService}
             onCancel={() => setSelectedService(null)}
-            footer={null}
+            footer={[
+              <Button key="back" onClick={() => setSelectedService(null)}>
+                {t("general.close")}
+              </Button>,
+            ]}
             width={900}
           >
             <Descriptions bordered column={1} size="small">
@@ -161,6 +259,14 @@ export const GeneralComponent = () => {
                 </Descriptions.Item>
               )}
             </Descriptions>
+            <div style={{ paddingTop: "16px", textAlign: "right" }}>
+              <Dropdown
+                menu={{ items: serviceActionItems }}
+                trigger={["click"]}
+              >
+                <Button>{t("general.actions")}</Button>
+              </Dropdown>
+            </div>
             <h4 className={styles.instancesHeader}>
               {t("general.instancesCount", {
                 count: selectedService.instances?.length || 0,
@@ -177,6 +283,17 @@ export const GeneralComponent = () => {
                     >
                       {t("general.details")}
                     </Button>,
+                    <Popconfirm
+                      title={t("general.deleteInstance")}
+                      description={t("general.areYouSureDeleteInstance")}
+                      onConfirm={() => deleteInstance(instance.id)}
+                      okText={t("general.yes")}
+                      cancelText={t("general.no")}
+                    >
+                      <Button type="link" danger>
+                        {t("general.delete")}
+                      </Button>
+                    </Popconfirm>,
                   ]}
                 >
                   <List.Item.Meta
