@@ -24,13 +24,13 @@ import { HomeOutlined, MoreOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
 const getServiceStatus = (
-  instances: ServiceInstanceOutput[]
+  service: ServiceSchemaOutput
 ): "success" | "default" | "error" | "warning" => {
-  if (!instances || instances.length === 0) {
+  if (!service || service.instances.length === 0 || service.enabled === false) {
     return "default";
   }
-  const healthyInstances = instances.filter((i) => i.healthy).length;
-  if (healthyInstances === instances.length) {
+  const healthyInstances = service.instances.filter((i) => i.healthy).length;
+  if (healthyInstances === service.instances.length) {
     return "success";
   }
   if (healthyInstances === 0) {
@@ -191,7 +191,7 @@ export const GeneralComponent = () => {
                         {service.title || service.name}
                       </Typography.Title>
 
-                      <Badge status={getServiceStatus(service.instances)} />
+                      <Badge status={getServiceStatus(service)} />
                     </div>
 
                     <Typography.Paragraph
