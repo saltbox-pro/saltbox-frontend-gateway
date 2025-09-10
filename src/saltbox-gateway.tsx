@@ -18,6 +18,7 @@ export const saltboxModule = {
   name: "saltbox-frontend-gate",
   path: "/gateway",
   settingsConfig: {
+    priority: 10,
     key: "gateway",
     label: "Gateway",
     children: [
