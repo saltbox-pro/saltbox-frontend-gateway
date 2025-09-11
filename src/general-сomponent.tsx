@@ -54,6 +54,12 @@ export const GeneralComponent = () => {
       .getServicesApiDiscoveryServicesGet()
       .then((serv) => {
         setServices(serv);
+        if (selectedService) {
+          const newSelectedService = serv.find(
+            (s) => s.name === selectedService.name
+          );
+          setSelectedService(newSelectedService || null);
+        }
       })
       .finally(() => {
         setIsServicesLoading(false);
@@ -71,8 +77,7 @@ export const GeneralComponent = () => {
         service_name: selectedService.name,
       })
       .then(() => {
-        setSelectedService(null);
-        fetchServices();
+        window.location.reload();
       });
   };
 
@@ -86,8 +91,7 @@ export const GeneralComponent = () => {
         },
       })
       .then(() => {
-        setSelectedService(null);
-        fetchServices();
+        window.location.reload();
       });
   };
 
@@ -99,7 +103,6 @@ export const GeneralComponent = () => {
         instance_id: instanceId,
       })
       .then(() => {
-        setSelectedService(null);
         fetchServices();
       });
   };
@@ -230,6 +233,7 @@ export const GeneralComponent = () => {
 
         {selectedService && (
           <Modal
+            loading={isServicesLoading}
             title={t("general.serviceTitle", {
               name: selectedService.title || selectedService.name,
             })}
@@ -283,17 +287,19 @@ export const GeneralComponent = () => {
                     >
                       {t("general.details")}
                     </Button>,
-                    <Popconfirm
-                      title={t("general.deleteInstance")}
-                      description={t("general.areYouSureDeleteInstance")}
-                      onConfirm={() => deleteInstance(instance.id)}
-                      okText={t("general.yes")}
-                      cancelText={t("general.no")}
-                    >
-                      <Button type="link" danger>
-                        {t("general.delete")}
-                      </Button>
-                    </Popconfirm>,
+                    selectedService.instances.length > 1 && (
+                      <Popconfirm
+                        title={t("general.deleteInstance")}
+                        description={t("general.areYouSureDeleteInstance")}
+                        onConfirm={() => deleteInstance(instance.id)}
+                        okText={t("general.yes")}
+                        cancelText={t("general.no")}
+                      >
+                        <Button type="link" danger>
+                          {t("general.delete")}
+                        </Button>
+                      </Popconfirm>
+                    ),
                   ]}
                 >
                   <List.Item.Meta
