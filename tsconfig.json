@@ -1,4 +1,5 @@
 {
+  "extends": "ts-config-single-spa",
   "compilerOptions": {
     "target": "es2022",
     "lib": [
@@ -11,6 +12,7 @@
     "declaration": true,
     "baseUrl": ".",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "paths": {
       "saltbox-gateway/*": [
         "src/*"
