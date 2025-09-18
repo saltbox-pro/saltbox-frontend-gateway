@@ -35,4 +35,4 @@ class ApiGatewayStore {
   }
 }
 
-export const apiGatewayStore = new ApiGatewayStore("discovery");
+export const apiGatewayStore = new ApiGatewayStore("gateway");
