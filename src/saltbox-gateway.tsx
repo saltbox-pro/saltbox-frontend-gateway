@@ -35,6 +35,12 @@ export const saltboxModule = {
       for (const service of services) {
         envStore.services.set(service.service_name, service.env);
       }
+      if (!envStore.services.has("gateway")) {
+        envStore.services.set("gateway", {
+          api_base_path: "",
+          ws_server_url: null,
+        });
+      }
     });
     autorun(() => {
       i18nStore.currentLanguage = localeStore.currentLocale;
