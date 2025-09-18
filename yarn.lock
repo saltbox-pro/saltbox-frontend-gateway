@@ -1555,10 +1555,10 @@
     is-mobile "^5.0.0"
     react-is "^18.2.0"
 
-"@saltbox/saltbox-frontend-common@0.0.4":
-  version "0.0.4"
-  resolved "https://dev.saltbox.pro/api/v4/projects/70/packages/npm/@saltbox/saltbox-frontend-common/-/@saltbox/saltbox-frontend-common-0.0.4.tgz#8753a22c656ec408150c53eb70703f40a9426178"
-  integrity sha1-h1OiLGVuxAgVDFPrcHA/QKlCYXg=
+"@saltbox/saltbox-frontend-common@0.0.11":
+  version "0.0.11"
+  resolved "https://dev.saltbox.pro/api/v4/projects/70/packages/npm/@saltbox/saltbox-frontend-common/-/@saltbox/saltbox-frontend-common-0.0.11.tgz#826428ed2955e807191af25f2b98b2aa9602fac6"
+  integrity sha1-gmQo7SlV6AcZGvJfK5iyqpYC+sY=
 
 "@saltbox/saltbox-gateway-api-client@0.0.1-cb3edec7e64a24e8d1d3ffcb47d2829dc35c8f7e":
   version "0.0.1-cb3edec7e64a24e8d1d3ffcb47d2829dc35c8f7e"
