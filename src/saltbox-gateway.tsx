@@ -3,8 +3,9 @@ import ReactDOMClient from "react-dom/client";
 import singleSpaReact from "single-spa-react";
 import Root from "./root.component";
 import { appStore, envStore } from "saltbox-gateway/store";
-import { autorun, runInAction } from "mobx";
+import { runInAction } from "mobx";
 import { i18nStore } from "saltbox-gateway/store/i18n-store";
+import { SaltboxModule } from "@saltbox/saltbox-frontend-common";
 
 const lifecycles = singleSpaReact({
   React,
@@ -13,7 +14,7 @@ const lifecycles = singleSpaReact({
   domElementGetter: () => document.getElementById("app-container"),
 });
 
-export const saltboxModule = {
+export const saltboxModule: SaltboxModule = {
   singleSpaLifecycle: lifecycles,
   name: "saltbox-frontend-gate",
   path: "/gateway",
@@ -42,7 +43,7 @@ export const saltboxModule = {
         });
       }
     });
-    autorun(() => {
+    localeStore.subscribe(() => {
       i18nStore.currentLanguage = localeStore.currentLocale;
     });
   },
