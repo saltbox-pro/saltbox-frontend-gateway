@@ -1,50 +1,32 @@
-import React from "react";
-import ReactDOMClient from "react-dom/client";
-import singleSpaReact from "single-spa-react";
-import Root from "./root.component";
-import { appStore, envStore } from "saltbox-gateway/store";
-import { runInAction } from "mobx";
-import { i18nStore } from "saltbox-gateway/store/i18n-store";
-import { SaltboxModule } from "@saltbox/saltbox-frontend-common";
+// CRITICAL: Coordinate shared scope between independently loaded bundles
+// Root-config and gateway are loaded as separate webpack bundles,
+// each with their own __webpack_share_scopes__. We need to merge them.
 
-const lifecycles = singleSpaReact({
-  React,
-  ReactDOMClient,
-  rootComponent: Root,
-  domElementGetter: () => document.getElementById("app-container"),
-});
+// Initialize gateway's sharing
+// @ts-ignore
+await __webpack_init_sharing__("default");
 
-export const saltboxModule: SaltboxModule = {
-  singleSpaLifecycle: lifecycles,
-  name: "saltbox-frontend-gate",
-  path: "/gateway",
-  settingsConfig: {
-    priority: 10,
-    key: "gateway",
-    label: "Gateway",
-    children: [
-      {
-        key: "general",
-        label: { en: "General", ru: "Основное" },
-        path: "/gateway",
-      },
-    ],
-  },
-  init: (authStore, services, localeStore, pluginsStore) => {
-    appStore.init(authStore, pluginsStore);
-    runInAction(() => {
-      for (const service of services) {
-        envStore.services.set(service.service_name, service.env);
-      }
-      if (!envStore.services.has("gateway")) {
-        envStore.services.set("gateway", {
-          api_base_path: "",
-          ws_server_url: null,
-        });
-      }
-    });
-    localeStore.subscribe(() => {
-      i18nStore.currentLanguage = localeStore.currentLocale;
-    });
-  },
-};
+// Check if there's already a global shared scope (from root-config)
+// @ts-ignore
+if (!window.__webpack_share_registry__) {
+  // @ts-ignore
+  window.__webpack_share_registry__ = __webpack_share_scopes__;
+} else {
+  // Merge root's shared scope into gateway's scope
+  // @ts-ignore
+  const rootShared = window.__webpack_share_registry__.default;
+  // @ts-ignore
+  const gatewayShared = __webpack_share_scopes__.default;
+
+  // For each shared module in root, use it in gateway if not already loaded
+  // @ts-ignore
+  for (const [key, value] of Object.entries(rootShared)) {
+    if (!gatewayShared[key] || !gatewayShared[key].loaded) {
+      gatewayShared[key] = value;
+    }
+  }
+}
+
+const { saltboxModule: saltboxModuleImported } = await import("./bootstrap");
+
+export const saltboxModule = saltboxModuleImported;

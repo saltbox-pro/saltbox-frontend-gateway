@@ -1,8 +1,9 @@
 const { merge } = require("webpack-merge");
 const webpack = require("webpack");
 const singleSpaDefaults = require("webpack-config-single-spa-react-ts");
-const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
+const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
+const path = require("path");
 
 module.exports = (webpackConfigEnv, argv) => {
   const defaultConfig = singleSpaDefaults({
@@ -30,10 +31,21 @@ module.exports = (webpackConfigEnv, argv) => {
         DEVELOPMENT: argv.mode === "development",
         PRODUCTION: argv.mode === "production",
       }),
+      new ModuleFederationPlugin({
+        name: "gateway",
+        filename: "remoteEntry.js",
+        shared: {
+          "mobx": {
+            singleton: true,
+            eager: false,
+            requiredVersion: false,
+          },
+        },
+      }),
     ],
     output: {
       filename: "index.js",
-    },
+    },    
   });
 
   config.externals = [];
