@@ -50,6 +50,7 @@
     "@saltbox/saltbox-frontend-common": "0.0.11",
     "@saltbox/saltbox-gateway-api-client": "0.0.1-cb3edec7e64a24e8d1d3ffcb47d2829dc35c8f7e",
     "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.13.12",
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.9",
     "@types/systemjs": "^6.1.1",
