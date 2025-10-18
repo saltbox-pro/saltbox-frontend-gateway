@@ -14,13 +14,12 @@ import {
   Dropdown,
   List,
   MenuProps,
-  Modal,
   Popconfirm,
   Tag,
   Typography,
 } from "antd";
-import { PageHeader } from "@saltbox/saltbox-frontend-common";
-import { HomeOutlined, MoreOutlined } from "@ant-design/icons";
+import { PageHeader, Modal } from "@saltbox/saltbox-frontend-common";
+import { HomeOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
 const getServiceStatus = (
