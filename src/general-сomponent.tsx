@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ComponentProps, useEffect, useState } from "react";
 import styles from "./general-сomponent.module.css";
 import {
   ServiceInstanceOutput,
@@ -11,16 +11,16 @@ import {
   Button,
   Card,
   Descriptions,
-  Dropdown,
   List,
-  MenuProps,
   Popconfirm,
   Tag,
   Typography,
 } from "antd";
-import { PageHeader, Modal } from "@saltbox/saltbox-frontend-common";
+import { PageHeader, Modal, Dropdown } from "@saltbox/saltbox-frontend-common";
 import { HomeOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+
+type MenuItems = ComponentProps<typeof Dropdown>["menu"]["items"];
 
 const getServiceStatus = (
   service: ServiceSchemaOutput
@@ -106,7 +106,7 @@ export const GeneralComponent = () => {
       });
   };
 
-  const serviceActionItems: MenuProps["items"] = [
+  const serviceActionItems: MenuItems = [
     {
       key: "toggle",
       label: selectedService?.enabled
