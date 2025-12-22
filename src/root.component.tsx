@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router";
+
 import { GeneralComponent } from "saltbox-gateway/general-сomponent";
 import "@saltbox/saltbox-frontend-common/dist/saltbox-frontend-common.css";
 

@@ -2,14 +2,14 @@
   width: 100%;
 }
 .card :global(.ant-card-body) {
-    padding: 0;
+  padding: 0;
 }
 .card :global(.ant-card-body) :global(.ant-descriptions-view) {
-    border: none;
-    border-radius: 0;
+  border: none;
+  border-radius: 0;
 }
 .card :global(.ant-card-body) :global(.ant-descriptions-view) th {
-    border-start-start-radius: 0!important;
+  border-start-start-radius: 0 !important;
 }
 .cardTitle {
   display: flex;
@@ -26,7 +26,7 @@
 }
 
 .cardTitleText {
-   margin-top: 8px;
+  margin-top: 8px;
 }
 
 .cardDescription {

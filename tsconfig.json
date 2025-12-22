@@ -2,10 +2,7 @@
   "extends": "ts-config-single-spa",
   "compilerOptions": {
     "target": "es2022",
-    "lib": [
-      "es2022",
-      "dom"
-    ],
+    "lib": ["es2022", "dom"],
     "jsx": "react-jsx",
     "experimentalDecorators": true,
     "moduleResolution": "node",
@@ -13,13 +10,10 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "isolatedModules": true,
     "paths": {
-      "saltbox-gateway/*": [
-        "src/*"
-      ],
+      "saltbox-gateway/*": ["src/*"]
     }
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }

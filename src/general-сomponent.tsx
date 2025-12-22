@@ -1,10 +1,6 @@
-import { ComponentProps, useEffect, useState } from "react";
-import styles from "./general-сomponent.module.css";
-import {
-  ServiceInstanceOutput,
-  ServiceSchemaOutput,
-} from "@saltbox/saltbox-gateway-api-client";
-import { apiGatewayStore } from "saltbox-gateway/store";
+import { HomeOutlined } from "@ant-design/icons";
+import { PageHeader, Modal, Dropdown } from "@saltbox/saltbox-frontend-common";
+import { ServiceInstanceOutput, ServiceSchemaOutput } from "@saltbox/saltbox-gateway-api-client";
 import {
   Badge,
   Breadcrumb,
@@ -16,9 +12,12 @@ import {
   Tag,
   Typography,
 } from "antd";
-import { PageHeader, Modal, Dropdown } from "@saltbox/saltbox-frontend-common";
-import { HomeOutlined } from "@ant-design/icons";
+import { ComponentProps, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+
+import { apiGatewayStore } from "saltbox-gateway/store";
+
+import styles from "./general-сomponent.module.css";
 
 type MenuItems = ComponentProps<typeof Dropdown>["menu"]["items"];
 
@@ -41,10 +40,8 @@ export const GeneralComponent = () => {
   const [services, setServices] = useState<ServiceSchemaOutput[]>([]);
   const { t } = useTranslation();
   const [isServicesLoading, setIsServicesLoading] = useState(true);
-  const [selectedService, setSelectedService] =
-    useState<ServiceSchemaOutput | null>(null);
-  const [selectedInstance, setSelectedInstance] =
-    useState<ServiceInstanceOutput | null>(null);
+  const [selectedService, setSelectedService] = useState<ServiceSchemaOutput | null>(null);
+  const [selectedInstance, setSelectedInstance] = useState<ServiceInstanceOutput | null>(null);
   const [modal, contextHolder] = Modal.useModal();
 
   const fetchServices = () => {
@@ -54,9 +51,7 @@ export const GeneralComponent = () => {
       .then((serv) => {
         setServices(serv);
         if (selectedService) {
-          const newSelectedService = serv.find(
-            (s) => s.name === selectedService.name
-          );
+          const newSelectedService = serv.find((s) => s.name === selectedService.name);
           setSelectedService(newSelectedService || null);
         }
       })
@@ -109,9 +104,7 @@ export const GeneralComponent = () => {
   const serviceActionItems: MenuItems = [
     {
       key: "toggle",
-      label: selectedService?.enabled
-        ? t("general.disable")
-        : t("general.enable"),
+      label: selectedService?.enabled ? t("general.disable") : t("general.enable"),
       onClick: () => {
         modal.confirm({
           title: selectedService?.enabled
@@ -185,11 +178,7 @@ export const GeneralComponent = () => {
                 title={
                   <div className={styles.cardTitle}>
                     <div className={styles.cardTitleHeader}>
-                      <Typography.Title
-                        level={5}
-                        className={styles.cardTitleText}
-                        ellipsis
-                      >
+                      <Typography.Title level={5} className={styles.cardTitleText} ellipsis>
                         {service.title || service.name}
                       </Typography.Title>
 
@@ -217,9 +206,7 @@ export const GeneralComponent = () => {
                     <Descriptions.Item label={t("general.vendor")}>
                       {service.vendor}
                     </Descriptions.Item>
-                    <Descriptions.Item label={t("general.type")}>
-                      {service.type}
-                    </Descriptions.Item>
+                    <Descriptions.Item label={t("general.type")}>{service.type}</Descriptions.Item>
                     <Descriptions.Item label={t("general.instances")}>
                       {service.instances?.length || 0}
                     </Descriptions.Item>
@@ -255,18 +242,13 @@ export const GeneralComponent = () => {
               {selectedService.enabled !== undefined && (
                 <Descriptions.Item label={t("general.enabled")}>
                   <Tag color={selectedService.enabled ? "blue" : "grey"}>
-                    {selectedService.enabled
-                      ? t("general.enabled")
-                      : t("general.disabled")}
+                    {selectedService.enabled ? t("general.enabled") : t("general.disabled")}
                   </Tag>
                 </Descriptions.Item>
               )}
             </Descriptions>
             <div style={{ paddingTop: "16px", textAlign: "right" }}>
-              <Dropdown
-                menu={{ items: serviceActionItems }}
-                trigger={["click"]}
-              >
+              <Dropdown menu={{ items: serviceActionItems }} trigger={["click"]}>
                 <Button>{t("general.actions")}</Button>
               </Dropdown>
             </div>
@@ -280,10 +262,7 @@ export const GeneralComponent = () => {
               renderItem={(instance) => (
                 <List.Item
                   actions={[
-                    <Button
-                      type="link"
-                      onClick={() => setSelectedInstance(instance)}
-                    >
+                    <Button type="link" onClick={() => setSelectedInstance(instance)}>
                       {t("general.details")}
                     </Button>,
                     selectedService.instances.length > 1 && (
@@ -309,14 +288,10 @@ export const GeneralComponent = () => {
                   />
                   <div>
                     <Tag color={instance.healthy ? "green" : "red"}>
-                      {instance.healthy
-                        ? t("general.healthy")
-                        : t("general.unhealthy")}
+                      {instance.healthy ? t("general.healthy") : t("general.unhealthy")}
                     </Tag>
                     <Tag color={instance.enabled ? "blue" : "grey"}>
-                      {instance.enabled
-                        ? t("general.enabled")
-                        : t("general.disabled")}
+                      {instance.enabled ? t("general.enabled") : t("general.disabled")}
                     </Tag>
                   </div>
                 </List.Item>
@@ -334,9 +309,7 @@ export const GeneralComponent = () => {
             width={700}
           >
             <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label={t("general.id")}>
-                {selectedInstance.id}
-              </Descriptions.Item>
+              <Descriptions.Item label={t("general.id")}>{selectedInstance.id}</Descriptions.Item>
               <Descriptions.Item label={t("general.host")}>
                 {selectedInstance.host}
               </Descriptions.Item>
@@ -350,16 +323,12 @@ export const GeneralComponent = () => {
               )}
               {selectedInstance.last_check && (
                 <Descriptions.Item label={t("general.lastCheck")}>
-                  {new Date(
-                    selectedInstance.last_check * 1000
-                  ).toLocaleString()}
+                  {new Date(selectedInstance.last_check * 1000).toLocaleString()}
                 </Descriptions.Item>
               )}
               {selectedInstance.last_healthy && (
                 <Descriptions.Item label={t("general.lastHealthy")}>
-                  {new Date(
-                    selectedInstance.last_healthy * 1000
-                  ).toLocaleString()}
+                  {new Date(selectedInstance.last_healthy * 1000).toLocaleString()}
                 </Descriptions.Item>
               )}
               <Descriptions.Item label={t("general.endpoints")}>

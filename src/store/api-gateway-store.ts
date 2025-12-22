@@ -1,8 +1,6 @@
+import { DiscoveryApi, Configuration } from "@saltbox/saltbox-gateway-api-client";
 import { computed, makeObservable, observable } from "mobx";
-import {
-  DiscoveryApi,
-  Configuration,
-} from "@saltbox/saltbox-gateway-api-client";
+
 import { appStore, envStore } from "saltbox-gateway/store";
 
 class ApiGatewayStore {

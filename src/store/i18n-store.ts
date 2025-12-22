@@ -1,7 +1,7 @@
-import { initReactI18next } from "react-i18next";
 import i18n from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
+import { initReactI18next } from "react-i18next";
 
 export enum AppLanguage {
   EN = "en",
@@ -9,10 +9,7 @@ export enum AppLanguage {
 }
 
 class I18NStore {
-  readonly supportedLanguages: Array<AppLanguage> = [
-    AppLanguage.EN,
-    AppLanguage.RU,
-  ];
+  readonly supportedLanguages: Array<AppLanguage> = [AppLanguage.EN, AppLanguage.RU];
 
   constructor() {
     i18n

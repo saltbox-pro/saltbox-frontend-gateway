@@ -1,10 +1,12 @@
+import { autorun, runInAction } from "mobx";
 import React from "react";
 import ReactDOMClient from "react-dom/client";
 import singleSpaReact from "single-spa-react";
-import Root from "./root.component";
+
 import { appStore, envStore } from "saltbox-gateway/store";
-import { autorun, runInAction } from "mobx";
 import { i18nStore } from "saltbox-gateway/store/i18n-store";
+
+import Root from "./root.component";
 
 const lifecycles = singleSpaReact({
   React,
