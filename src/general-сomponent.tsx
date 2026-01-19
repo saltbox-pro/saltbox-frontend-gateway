@@ -1,4 +1,4 @@
-import { HomeOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, HomeOutlined } from "@ant-design/icons";
 import { PageHeader, Modal, Dropdown } from "@saltbox/saltbox-frontend-common";
 import { ServiceInstanceOutput, ServiceSchemaOutput } from "@saltbox/saltbox-gateway-api-client";
 import {
@@ -144,18 +144,9 @@ export const GeneralComponent = () => {
   return (
     <>
       {contextHolder}
-      <Breadcrumb
-        items={[
-          {
-            href: "/",
-            title: <HomeOutlined />,
-          },
-          {
-            title: t("general.title"),
-          },
-        ]}
-      />
-      <PageHeader title={t("general.title")}></PageHeader>
+
+      <PageHeader title={t("general.title")} />
+
       <div className={styles.container}>
         <List
           loading={isServicesLoading}
