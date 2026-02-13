@@ -2188,10 +2188,10 @@
     tailwind-merge "^3.3.1"
     zod "^4.0.17"
 
-"@saltbox/saltbox-frontend-common@^0.0.67":
-  version "0.0.67"
-  resolved "https://dev.saltbox.pro/api/v4/projects/70/packages/npm/@saltbox/saltbox-frontend-common/-/@saltbox/saltbox-frontend-common-0.0.67.tgz#953f2be0e5363f78626bedc5a8a32a0f4a0c4231"
-  integrity sha1-lT8r4OU2P3hia+3FqKMqD0oMQjE=
+"@saltbox/saltbox-frontend-common@^0.0.78":
+  version "0.0.78"
+  resolved "https://dev.saltbox.pro/api/v4/projects/70/packages/npm/@saltbox/saltbox-frontend-common/-/@saltbox/saltbox-frontend-common-0.0.78.tgz#cbe112a37a2594f47dc6228f792c2256ae0ba633"
+  integrity sha1-y+ESo3ollPR9xiKPeSwiVq4LpjM=
   dependencies:
     "@material-symbols/font-300" "^0.38.0"
     "@monaco-editor/react" "^4.7.0"
