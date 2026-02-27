@@ -1,5 +1,10 @@
 import { ArrowLeftOutlined, HomeOutlined } from "@ant-design/icons";
-import { PageHeader, Modal, Dropdown } from "@saltbox/saltbox-frontend-common";
+import {
+  getDiscoveryServiceStatus,
+  PageHeader,
+  Modal,
+  Dropdown,
+} from "@saltbox/saltbox-frontend-common";
 import { ServiceInstanceOutput, ServiceSchemaOutput } from "@saltbox/saltbox-gateway-api-client";
 import {
   Badge,
@@ -21,21 +26,6 @@ import styles from "./general-сomponent.module.css";
 
 type MenuItems = ComponentProps<typeof Dropdown>["menu"]["items"];
 
-const getServiceStatus = (
-  service: ServiceSchemaOutput
-): "success" | "default" | "error" | "warning" => {
-  if (!service || service.instances.length === 0 || service.enabled === false) {
-    return "default";
-  }
-  const healthyInstances = service.instances.filter((i) => i.healthy).length;
-  if (healthyInstances === service.instances.length) {
-    return "success";
-  }
-  if (healthyInstances === 0) {
-    return "error";
-  }
-  return "warning";
-};
 export const GeneralComponent = () => {
   const [services, setServices] = useState<ServiceSchemaOutput[]>([]);
   const { t } = useTranslation();
@@ -173,7 +163,7 @@ export const GeneralComponent = () => {
                         {service.title || service.name}
                       </Typography.Title>
 
-                      <Badge status={getServiceStatus(service)} />
+                      <Badge status={getDiscoveryServiceStatus(service)} />
                     </div>
 
                     <Typography.Paragraph
