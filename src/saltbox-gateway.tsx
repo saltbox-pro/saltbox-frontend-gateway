@@ -27,6 +27,7 @@ export const saltboxModule = {
       {
         key: "general",
         label: { en: "General", ru: "Основное" },
+        icon: "apps",
         path: "/gateway",
       },
     ],
