@@ -3,12 +3,12 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import { GeneralComponent } from "saltbox-gateway/general-сomponent";
 import "@saltbox/saltbox-frontend-common/dist/saltbox-frontend-common.css";
 
-export default function Root(props) {
+export default function Root() {
   return (
-    <BrowserRouter basename="/gateway">
+    <BrowserRouter>
       <Routes>
         <Route
-          path="/"
+          path="/gateway"
           element={
             <>
               <GeneralComponent />

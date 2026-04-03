@@ -1,17 +1,6 @@
-import { ArrowLeftOutlined, HomeOutlined } from "@ant-design/icons";
 import { PageHeader, Modal, Dropdown } from "@saltbox/saltbox-frontend-common";
 import { ServiceInstanceOutput, ServiceSchemaOutput } from "@saltbox/saltbox-gateway-api-client";
-import {
-  Badge,
-  Breadcrumb,
-  Button,
-  Card,
-  Descriptions,
-  List,
-  Popconfirm,
-  Tag,
-  Typography,
-} from "antd";
+import { Badge, Button, Card, Descriptions, List, Popconfirm, Tag, Typography } from "antd";
 import { ComponentProps, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 

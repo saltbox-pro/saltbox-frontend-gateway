@@ -1,26 +1,35 @@
+import { AppLanguage, enCommon, ruCommon } from "@saltbox/saltbox-frontend-common";
 import i18n from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import Backend from "i18next-http-backend";
 import { initReactI18next } from "react-i18next";
 
-export enum AppLanguage {
-  EN = "en",
-  RU = "ru",
-}
+import enBase from "../locales/en/base.json";
+import ruBase from "../locales/ru/base.json";
+
+const resources = {
+  [AppLanguage.EN]: {
+    base: enBase,
+    common: enCommon,
+  },
+  [AppLanguage.RU]: {
+    base: ruBase,
+    common: ruCommon,
+  },
+};
 
 class I18NStore {
   readonly supportedLanguages: Array<AppLanguage> = [AppLanguage.EN, AppLanguage.RU];
 
   constructor() {
     i18n
-      .use(Backend)
       .use(LanguageDetector)
       .use(initReactI18next)
       .init({
         fallbackLng: AppLanguage.EN,
-        ns: ["base"],
+        ns: ["base", "common"],
         defaultNS: "base",
         debug: false,
+        resources,
         detection: {
           order: ["localStorage", "navigator"],
           caches: ["localStorage"],
@@ -29,12 +38,6 @@ class I18NStore {
           escapeValue: false,
         },
         supportedLngs: this.supportedLanguages,
-        backend: {
-          loadPath: DEVELOPMENT
-            ? "http://localhost:4203/locales/{{lng}}/{{ns}}.json"
-            : "/static/gateway/locales/{{lng}}/{{ns}}.json",
-          allowMultiLoading: true,
-        },
         react: {
           useSuspense: true,
         },
