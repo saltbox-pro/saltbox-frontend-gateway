@@ -46,7 +46,7 @@ export const saltboxModule = {
       }
     });
     autorun(() => {
-      i18nStore.currentLanguage = localeStore.currentLocale;
+      i18nStore.setLanguage(localeStore.currentLocale);
     });
   },
 };
