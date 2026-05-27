@@ -1,50 +1,288 @@
+.container {
+  padding: 0 16px 24px;
+}
+
+.toolbar {
+  margin-bottom: 20px;
+}
+
 .card {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: none !important;
+  box-shadow: 2px 3px 12px -3px rgba(0, 0, 0, 0.2);
 }
+
 .card :global(.ant-card-body) {
-  padding: 0;
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
-.card :global(.ant-card-body) :global(.ant-descriptions-view) {
-  border: none;
-  border-radius: 0;
+
+.cardHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ant-color-split, #f0f0f0);
 }
-.card :global(.ant-card-body) :global(.ant-descriptions-view) th {
-  border-start-start-radius: 0 !important;
+
+.cardTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
 }
+
 .cardTitle {
   display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-}
-
-.cardTitleHeader {
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
   flex: 1;
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  align-items: baseline;
 }
 
-.cardTitleText {
-  margin-top: 8px;
+.serviceIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.serviceTitle {
+  font-size: 18px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusBadge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.statusIconRunning {
+  font-size: 18px;
+  color: var(--ant-color-success, #52c41a);
+}
+
+.statusIconStopped {
+  font-size: 18px;
+  color: var(--ant-color-error, #ff4d4f);
+}
+
+.statusRunning {
+  color: var(--ant-color-success, #52c41a);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.statusStopped {
+  color: var(--ant-color-error, #ff4d4f);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .cardDescription {
-  font-weight: normal;
-  margin: 0;
+  font-size: 15px;
+  margin: 0 !important;
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45));
+  line-height: 1.5;
 }
 
-.cardContent {
-  min-height: 80px;
+.cardBody {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.cardMeta {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  gap: 4px;
 }
 
-.noBorder {
-  border: none;
+.cardBalancing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.instancesHeader {
-  margin-top: 24px;
+.cardBalancingLabel {
+  white-space: nowrap;
+}
+
+.cardActions {
+  display: flex;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ant-color-split, #f0f0f0);
+  justify-content: flex-start;
+}
+
+.btnRefresh {
+  background-color: #52c41a;
+  color: #fff;
+}
+
+.btnRefresh:hover {
+  background-color: #45a514 !important;
+}
+
+.btnDisable:hover {
+  background-color: #d9363e !important;
+  border-color: #d9363e !important;
+}
+
+.btnDetails {
+  background-color: var(--ant-color-text-heading, #434343);
+  border-color: var(--ant-color-text-heading, #434343);
+  color: #fff;
+}
+
+.btnDetails:hover {
+  background-color: var(--ant-color-text, #262626) !important;
+  border-color: var(--ant-color-text, #262626) !important;
+  color: #fff !important;
+}
+
+.btnDelete:hover {
+  background-color: var(--ant-color-error, #ff4d4f) !important;
+  color: #fff !important;
+}
+
+.modalTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+}
+
+.section {
+  margin-top: 22px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ant-color-split, #f0f0f0);
+}
+
+.sectionTitle :global(.ant-typography) {
+  font-size: 16px;
+}
+
+.basicInfoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 28px;
+}
+
+.basicInfoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.basicInfoItem :global(.ant-tag) {
+  font-size: 14px;
+}
+
+.basicInfoFieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.descriptionText {
+  margin: 0 !important;
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45));
+}
+
+.instanceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  padding: 8px 4px;
+  background-color: #fafafa;
+  border-radius: var(--ant-border-radius, 6px);
+  border-left: 4px solid var(--ant-color-split, #f0f0f0);
+}
+
+.instanceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.instanceTitleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.instanceIcon {
+  font-size: 18px;
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45));
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.instanceId {
+  font-size: 14px;
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45));
+  word-break: break-all;
+}
+
+.instanceHost {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.instanceTimestamp {
+  font-size: 14px;
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45));
+  padding-left: 28px;
+}
+
+.instanceRelativeTime {
+  color: var(--ant-color-primary, #52c41a);
+  margin-left: 2px;
+}
+
+.instanceActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.healthyStatus {
+  color: var(--ant-color-success, #52c41a);
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.unhealthyStatus {
+  color: var(--ant-color-error, #ff4d4f);
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
 }

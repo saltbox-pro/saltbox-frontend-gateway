@@ -1,134 +1,269 @@
-import { PageHeader, Modal, Dropdown } from "@saltbox/saltbox-frontend-common";
-import { ServiceInstanceOutput, ServiceSchemaOutput } from "@saltbox/saltbox-gateway-api-client";
-import { Badge, Button, Card, Descriptions, List, Popconfirm, Tag, Typography } from "antd";
-import { ComponentProps, useEffect, useState } from "react";
+import {
+  CheckCircleFilled,
+  ExclamationCircleOutlined,
+  EyeOutlined,
+  GlobalOutlined,
+  HddOutlined,
+  NodeIndexOutlined,
+  PoweroffOutlined,
+  SettingOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
+import { PageHeader, Modal } from "@saltbox/saltbox-frontend-common";
+import {
+  ProxyBalancingStrategy,
+  ServiceInstanceOutput,
+  ServiceSchemaOutput,
+  ServiceType,
+} from "@saltbox/saltbox-gateway-api-client";
+import { Badge, Button, Card, Flex, List, Popconfirm, Select, Tag, Typography } from "antd";
+import { TFunction } from "i18next";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { apiGatewayStore } from "saltbox-gateway/store";
 
 import styles from "./general-сomponent.module.css";
 
-type MenuItems = ComponentProps<typeof Dropdown>["menu"]["items"];
-
-const getServiceStatus = (
-  service: ServiceSchemaOutput
-): "success" | "default" | "error" | "warning" => {
-  if (!service || service.instances.length === 0 || service.enabled === false) {
-    return "default";
-  }
-  const healthyInstances = service.instances.filter((i) => i.healthy).length;
-  if (healthyInstances === service.instances.length) {
-    return "success";
-  }
-  if (healthyInstances === 0) {
-    return "error";
-  }
-  return "warning";
+const BALANCING_LABELS: Record<ProxyBalancingStrategy, string> = {
+  [ProxyBalancingStrategy.Rand]: "Random",
+  [ProxyBalancingStrategy.Rr]: "Round Robin",
+  [ProxyBalancingStrategy.Wrr]: "Weighted RR",
 };
+
+const BALANCING_OPTIONS = (
+  Object.entries(BALANCING_LABELS) as [ProxyBalancingStrategy, string][]
+).map(([value, label]) => ({ value, label }));
+
+const TYPE_COLORS: Record<ServiceType, string> = {
+  [ServiceType.Official]: "green",
+  [ServiceType.ThirdParty]: "purple",
+};
+
+const getServiceStatus = (service: ServiceSchemaOutput): "running" | "stopped" => {
+  if (!service || !service.enabled || service.instances.length === 0) return "stopped";
+  const healthyCount = service.instances.filter((i) => i.healthy).length;
+  return healthyCount > 0 ? "running" : "stopped";
+};
+
+const getHealthyCount = (service: ServiceSchemaOutput): number => {
+  return service.instances.filter((i) => i.healthy).length;
+};
+
+const formatRelativeTime = (timestamp: number, t: TFunction): string => {
+  const diff = Math.floor(Date.now() / 1000) - timestamp;
+  if (diff < 60) return t("general.justNow");
+  if (diff < 3600) return t("general.minutesAgo", { n: Math.floor(diff / 60) });
+  if (diff < 86400) return t("general.hoursAgo", { n: Math.floor(diff / 3600) });
+  return t("general.daysAgo", { n: Math.floor(diff / 86400) });
+};
+
+type ServiceCardProps = {
+  service: ServiceSchemaOutput;
+  onToggle: (service: ServiceSchemaOutput) => void;
+  onDetails: (service: ServiceSchemaOutput) => void;
+  onChangeBalancing: (service: ServiceSchemaOutput, strategy: ProxyBalancingStrategy) => void;
+};
+
+const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: ServiceCardProps) => {
+  const { t } = useTranslation();
+  const status = getServiceStatus(service);
+  const healthyCount = getHealthyCount(service);
+  const total = service.instances.length;
+
+  return (
+    <List.Item>
+      <Card className={styles.card}>
+        <div className={styles.cardHeader}>
+          <div className={styles.cardTitleRow}>
+            <div className={styles.cardTitle}>
+              <HddOutlined className={styles.serviceIcon} />
+              <Typography.Text strong className={styles.serviceTitle}>
+                {service.title || service.name}
+              </Typography.Text>
+            </div>
+            <div className={styles.statusBadge}>
+              {status === "running" ? (
+                <>
+                  <span className={styles.statusRunning}>{t("general.running")}</span>
+                  <CheckCircleFilled className={styles.statusIconRunning} />
+                </>
+              ) : (
+                <>
+                  <span className={styles.statusStopped}>{t("general.stopped")}</span>
+                  <ExclamationCircleOutlined className={styles.statusIconStopped} />
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className={styles.cardTags}>
+            <Tag>{service.name}</Tag>
+            <Tag color={TYPE_COLORS[service.type]}>
+              {service.type === ServiceType.Official
+                ? t("general.official")
+                : t("general.thirdParty")}
+            </Tag>
+          </div>
+
+          {service.description && (
+            <Typography.Paragraph
+              type="secondary"
+              className={styles.cardDescription}
+              ellipsis={{ rows: 2 }}
+            >
+              {service.description}
+            </Typography.Paragraph>
+          )}
+        </div>
+
+        <div className={styles.cardBody}>
+          <div className={styles.cardMeta}>
+            <span>
+              <Typography.Text type="secondary">{t("general.vendor")}: </Typography.Text>
+              <Typography.Text>{service.vendor}</Typography.Text>
+            </span>
+            <span>
+              <Typography.Text type="secondary">{t("general.instances")}: </Typography.Text>
+              <Typography.Text>
+                {healthyCount}/{total}
+              </Typography.Text>
+            </span>
+          </div>
+
+          <div
+            className={styles.cardBalancing}
+            role="presentation"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Typography.Text type="secondary" className={styles.cardBalancingLabel}>
+              {t("general.balancing")}:{" "}
+            </Typography.Text>
+            <Select
+              size="small"
+              value={service.load_balancing_strategy ?? ProxyBalancingStrategy.Rr}
+              options={BALANCING_OPTIONS}
+              onChange={(val) => onChangeBalancing(service, val)}
+            />
+          </div>
+        </div>
+
+        <div className={styles.cardActions}>
+          <Button
+            type="primary"
+            danger
+            icon={<PoweroffOutlined />}
+            className={styles.btnDisable}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggle(service);
+            }}
+          >
+            {service.enabled ? t("general.disable") : t("general.enable")}
+          </Button>
+          <Button
+            icon={<EyeOutlined />}
+            className={styles.btnDetails}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDetails(service);
+            }}
+          >
+            {t("general.details")}
+          </Button>
+        </div>
+      </Card>
+    </List.Item>
+  );
+};
+
 export const GeneralComponent = () => {
   const [services, setServices] = useState<ServiceSchemaOutput[]>([]);
   const { t } = useTranslation();
   const [isServicesLoading, setIsServicesLoading] = useState(true);
   const [selectedService, setSelectedService] = useState<ServiceSchemaOutput | null>(null);
-  const [selectedInstance, setSelectedInstance] = useState<ServiceInstanceOutput | null>(null);
   const [modal, contextHolder] = Modal.useModal();
 
-  const fetchServices = () => {
+  const fetchServices = useCallback(() => {
     setIsServicesLoading(true);
     apiGatewayStore.discoveryApi
       .getServicesApiDiscoveryServicesGet()
       .then((serv) => {
         setServices(serv);
-        if (selectedService) {
-          const newSelectedService = serv.find((s) => s.name === selectedService.name);
-          setSelectedService(newSelectedService || null);
-        }
+        setSelectedService((prev) =>
+          prev ? (serv.find((s) => s.name === prev.name) ?? null) : null
+        );
       })
-      .finally(() => {
-        setIsServicesLoading(false);
-      });
-  };
+      .finally(() => setIsServicesLoading(false));
+  }, []);
 
   useEffect(() => {
     fetchServices();
-  }, []);
+  }, [fetchServices]);
 
-  const deleteService = () => {
-    if (!selectedService) return;
-    apiGatewayStore.discoveryApi
-      .removeServiceApiDiscoveryUnregisterServiceNameDelete({
-        service_name: selectedService.name,
-      })
-      .then(() => {
-        window.location.reload();
-      });
-  };
+  const toggleService = useCallback(
+    (service: ServiceSchemaOutput) => {
+      apiGatewayStore.discoveryApi
+        .enableDisableServiceApiDiscoveryServicesServiceNameTogglePost({
+          service_name: service.name,
+          BodyEnableDisableServiceApiDiscoveryServicesServiceNameTogglePost: {
+            enabled: !service.enabled,
+          },
+        })
+        .then(fetchServices);
+    },
+    [fetchServices]
+  );
 
-  const toggleService = () => {
-    if (!selectedService) return;
+  const deleteService = (service: ServiceSchemaOutput) => {
     apiGatewayStore.discoveryApi
-      .enableDisableServiceApiDiscoveryServicesServiceNameTogglePost({
-        service_name: selectedService.name,
-        BodyEnableDisableServiceApiDiscoveryServicesServiceNameTogglePost: {
-          enabled: !selectedService.enabled,
-        },
-      })
+      .removeServiceApiDiscoveryUnregisterServiceNameDelete({ service_name: service.name })
       .then(() => {
-        window.location.reload();
-      });
-  };
-
-  const deleteInstance = (instanceId: string) => {
-    if (!selectedService) return;
-    apiGatewayStore.discoveryApi
-      .removeInstanceApiDiscoveryUnregisterServiceNameInstanceIdDelete({
-        service_name: selectedService.name,
-        instance_id: instanceId,
-      })
-      .then(() => {
+        setSelectedService(null);
         fetchServices();
       });
   };
 
-  const serviceActionItems: MenuItems = [
-    {
-      key: "toggle",
-      label: selectedService?.enabled ? t("general.disable") : t("general.enable"),
-      onClick: () => {
-        modal.confirm({
-          title: selectedService?.enabled
-            ? t("general.disableService")
-            : t("general.enableService"),
-          content: selectedService?.enabled
-            ? t("general.areYouSureDisableService")
-            : t("general.areYouSureEnableService"),
-          okText: t("general.yes"),
-          okType: "danger",
-          cancelText: t("general.no"),
-          onOk() {
-            toggleService();
+  const deleteInstance = (service: ServiceSchemaOutput, instanceId: string) => {
+    apiGatewayStore.discoveryApi
+      .removeInstanceApiDiscoveryUnregisterServiceNameInstanceIdDelete({
+        service_name: service.name,
+        instance_id: instanceId,
+      })
+      .then(fetchServices);
+  };
+
+  const handleChangeBalancing = useCallback(
+    (service: ServiceSchemaOutput, strategy: ProxyBalancingStrategy) => {
+      apiGatewayStore.discoveryApi
+        .changeBalancingStrategyApiDiscoveryServicesServiceNameChangeStrategyPatch({
+          service_name: service.name,
+          BodyChangeBalancingStrategyApiDiscoveryServicesServiceNameChangeStrategyPatch: {
+            strategy,
           },
-        });
-      },
+        })
+        .then(fetchServices);
     },
-    {
-      key: "delete",
-      label: t("general.delete"),
-      danger: true,
-      onClick: () => {
-        modal.confirm({
-          title: t("general.deleteService"),
-          content: t("general.areYouSureDeleteService"),
-          okText: t("general.yes"),
-          okType: "danger",
-          cancelText: t("general.no"),
-          onOk() {
-            deleteService();
-          },
-        });
-      },
+    [fetchServices]
+  );
+
+  const handleToggle = useCallback(
+    (service: ServiceSchemaOutput) => {
+      modal.confirm({
+        title: service.enabled ? t("general.disableService") : t("general.enableService"),
+        content: service.enabled
+          ? t("general.areYouSureDisableService")
+          : t("general.areYouSureEnableService"),
+        okText: t("general.yes"),
+        okType: "danger",
+        cancelText: t("general.no"),
+        onOk() {
+          toggleService(service);
+        },
+      });
     },
-  ];
+    [modal, t, toggleService]
+  );
 
   return (
     <>
@@ -137,184 +272,212 @@ export const GeneralComponent = () => {
       <PageHeader title={t("general.title")} />
 
       <div className={styles.container}>
+        <div className={styles.toolbar}>
+          <Button
+            type="primary"
+            icon={<SyncOutlined />}
+            loading={isServicesLoading}
+            className={styles.btnRefresh}
+            onClick={fetchServices}
+          >
+            {t("general.refresh")}
+          </Button>
+        </div>
+
         <List
           loading={isServicesLoading}
-          grid={{
-            gutter: 16,
-            xs: 1,
-            sm: 1,
-            md: 2,
-            lg: 3,
-            xl: 4,
-            xxl: 5,
-          }}
+          grid={{ gutter: 24, xs: 1, sm: 1, md: 1, lg: 2, xl: 2, xxl: 3 }}
           dataSource={services}
           renderItem={(service) => (
-            <List.Item>
-              <Card
-                hoverable
-                className={styles.card}
-                onClick={() => setSelectedService(service)}
-                title={
-                  <div className={styles.cardTitle}>
-                    <div className={styles.cardTitleHeader}>
-                      <Typography.Title level={5} className={styles.cardTitleText} ellipsis>
-                        {service.title || service.name}
-                      </Typography.Title>
-
-                      <Badge status={getServiceStatus(service)} />
-                    </div>
-
-                    <Typography.Paragraph
-                      type="secondary"
-                      className={styles.cardDescription}
-                      ellipsis={{ rows: 2 }}
-                    >
-                      {service.description}
-                    </Typography.Paragraph>
-                  </div>
-                }
-              >
-                <div className={styles.cardContent}>
-                  <Descriptions
-                    bordered
-                    column={1}
-                    size="small"
-                    className={styles.noBorder}
-                    styles={{ content: { textAlign: "right" } }}
-                  >
-                    <Descriptions.Item label={t("general.vendor")}>
-                      {service.vendor}
-                    </Descriptions.Item>
-                    <Descriptions.Item label={t("general.type")}>{service.type}</Descriptions.Item>
-                    <Descriptions.Item label={t("general.instances")}>
-                      {service.instances?.length || 0}
-                    </Descriptions.Item>
-                  </Descriptions>
-                </div>
-              </Card>
-            </List.Item>
+            <ServiceCard
+              service={service}
+              onToggle={handleToggle}
+              onDetails={setSelectedService}
+              onChangeBalancing={handleChangeBalancing}
+            />
           )}
         />
 
         {selectedService && (
           <Modal
-            loading={isServicesLoading}
-            title={t("general.serviceTitle", {
-              name: selectedService.title || selectedService.name,
-            })}
+            title={
+              <span className={styles.modalTitle}>
+                <HddOutlined />
+                {selectedService.title || selectedService.name}
+              </span>
+            }
             open={!!selectedService}
             onCancel={() => setSelectedService(null)}
             footer={[
-              <Button key="back" onClick={() => setSelectedService(null)}>
+              <Button
+                key="delete"
+                danger
+                className={styles.btnDelete}
+                onClick={() => {
+                  modal.confirm({
+                    title: t("general.deleteService"),
+                    content: t("general.areYouSureDeleteService"),
+                    okText: t("general.yes"),
+                    okType: "danger",
+                    cancelText: t("general.no"),
+                    onOk() {
+                      deleteService(selectedService);
+                    },
+                  });
+                }}
+              >
+                {t("general.deleteService")}
+              </Button>,
+              <Button key="close" onClick={() => setSelectedService(null)}>
                 {t("general.close")}
               </Button>,
             ]}
             width={900}
           >
-            <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label={t("general.vendor")}>
-                {selectedService.vendor}
-              </Descriptions.Item>
-              <Descriptions.Item label={t("general.type")}>
-                {selectedService.type}
-              </Descriptions.Item>
-              {selectedService.enabled !== undefined && (
-                <Descriptions.Item label={t("general.enabled")}>
-                  <Tag color={selectedService.enabled ? "blue" : "grey"}>
-                    {selectedService.enabled ? t("general.enabled") : t("general.disabled")}
+            <div className={styles.section}>
+              <div className={styles.sectionTitle}>
+                <SettingOutlined />
+                <Typography.Text strong>{t("general.basicInfo")}</Typography.Text>
+              </div>
+              <div className={styles.basicInfoGrid}>
+                <div className={styles.basicInfoItem}>
+                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
+                    {t("general.serviceName").toUpperCase()}:
+                  </Typography.Text>
+                  <Tag>{selectedService.name}</Tag>
+                </div>
+                <div className={styles.basicInfoItem}>
+                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
+                    {t("general.type").toUpperCase()}:
+                  </Typography.Text>
+                  <Tag color={TYPE_COLORS[selectedService.type]}>
+                    {selectedService.type === ServiceType.Official
+                      ? t("general.official")
+                      : t("general.thirdParty")}
                   </Tag>
-                </Descriptions.Item>
-              )}
-            </Descriptions>
-            <div style={{ paddingTop: "16px", textAlign: "right" }}>
-              <Dropdown menu={{ items: serviceActionItems }} trigger={["click"]}>
-                <Button>{t("general.actions")}</Button>
-              </Dropdown>
-            </div>
-            <h4 className={styles.instancesHeader}>
-              {t("general.instancesCount", {
-                count: selectedService.instances?.length || 0,
-              })}
-            </h4>
-            <List
-              dataSource={selectedService.instances}
-              renderItem={(instance) => (
-                <List.Item
-                  actions={[
-                    <Button type="link" onClick={() => setSelectedInstance(instance)}>
-                      {t("general.details")}
-                    </Button>,
-                    selectedService.instances.length > 1 && (
-                      <Popconfirm
-                        title={t("general.deleteInstance")}
-                        description={t("general.areYouSureDeleteInstance")}
-                        onConfirm={() => deleteInstance(instance.id)}
-                        okText={t("general.yes")}
-                        cancelText={t("general.no")}
-                      >
-                        <Button type="link" danger>
-                          {t("general.delete")}
-                        </Button>
-                      </Popconfirm>
-                    ),
-                  ]}
-                >
-                  <List.Item.Meta
-                    title={`${instance.host}:${instance.port}`}
-                    description={t("general.versionWithValue", {
-                      version: instance.version || t("general.na"),
-                    })}
+                </div>
+                <div className={styles.basicInfoItem}>
+                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
+                    {t("general.vendor").toUpperCase()}:
+                  </Typography.Text>
+                  <Typography.Text>{selectedService.vendor}</Typography.Text>
+                </div>
+                <div className={styles.basicInfoItem}>
+                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
+                    {t("general.state").toUpperCase()}:
+                  </Typography.Text>
+                  <Badge
+                    status={selectedService.enabled ? "success" : "error"}
+                    text={
+                      selectedService.enabled
+                        ? t("general.stateEnabled")
+                        : t("general.stateDisabled")
+                    }
                   />
-                  <div>
-                    <Tag color={instance.healthy ? "green" : "red"}>
-                      {instance.healthy ? t("general.healthy") : t("general.unhealthy")}
-                    </Tag>
-                    <Tag color={instance.enabled ? "blue" : "grey"}>
-                      {instance.enabled ? t("general.enabled") : t("general.disabled")}
-                    </Tag>
-                  </div>
-                </List.Item>
-              )}
-            />
-          </Modal>
-        )}
+                </div>
+                <div className={styles.basicInfoItem}>
+                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
+                    {t("general.balancing").toUpperCase()}:
+                  </Typography.Text>
+                  <Typography.Text>
+                    {
+                      BALANCING_LABELS[
+                        selectedService.load_balancing_strategy ?? ProxyBalancingStrategy.Rr
+                      ]
+                    }
+                  </Typography.Text>
+                </div>
+              </div>
+            </div>
 
-        {selectedInstance && (
-          <Modal
-            title={t("general.instanceTitle", { id: selectedInstance.id })}
-            open={!!selectedInstance}
-            onCancel={() => setSelectedInstance(null)}
-            footer={null}
-            width={700}
-          >
-            <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label={t("general.id")}>{selectedInstance.id}</Descriptions.Item>
-              <Descriptions.Item label={t("general.host")}>
-                {selectedInstance.host}
-              </Descriptions.Item>
-              <Descriptions.Item label={t("general.port")}>
-                {selectedInstance.port}
-              </Descriptions.Item>
-              {selectedInstance.version && (
-                <Descriptions.Item label={t("general.version")}>
-                  {selectedInstance.version}
-                </Descriptions.Item>
-              )}
-              {selectedInstance.last_check && (
-                <Descriptions.Item label={t("general.lastCheck")}>
-                  {new Date(selectedInstance.last_check * 1000).toLocaleString()}
-                </Descriptions.Item>
-              )}
-              {selectedInstance.last_healthy && (
-                <Descriptions.Item label={t("general.lastHealthy")}>
-                  {new Date(selectedInstance.last_healthy * 1000).toLocaleString()}
-                </Descriptions.Item>
-              )}
-              <Descriptions.Item label={t("general.endpoints")}>
-                {selectedInstance.endpoints?.length || 0}
-              </Descriptions.Item>
-            </Descriptions>
+            {selectedService.description && (
+              <div className={styles.section}>
+                <div className={styles.sectionTitle}>
+                  <Typography.Text strong>{t("general.description")}</Typography.Text>
+                </div>
+                <Typography.Paragraph className={styles.descriptionText}>
+                  {selectedService.description}
+                </Typography.Paragraph>
+              </div>
+            )}
+
+            <div className={styles.section}>
+              <div className={styles.sectionTitle}>
+                <NodeIndexOutlined />
+                <Typography.Text strong>
+                  {t("general.instancesCount", { count: selectedService.instances.length })}
+                </Typography.Text>
+              </div>
+              <List
+                dataSource={selectedService.instances}
+                renderItem={(instance: ServiceInstanceOutput) => (
+                  <List.Item>
+                    <div className={styles.instanceRow}>
+                      <div className={styles.instanceInfo}>
+                        <div className={styles.instanceTitleRow}>
+                          <GlobalOutlined className={styles.instanceIcon} />
+                          <div>
+                            <div className={styles.instanceId}>(id: {instance.id})</div>
+                            <div className={styles.instanceHost}>
+                              {instance.host}:{instance.port}
+                            </div>
+                          </div>
+                        </div>
+                        {instance.last_check && (
+                          <div className={styles.instanceTimestamp}>
+                            {t("general.lastCheck")}:{" "}
+                            {new Date(instance.last_check * 1000).toLocaleString()}
+                            <span className={styles.instanceRelativeTime}>
+                              ({formatRelativeTime(instance.last_check, t)})
+                            </span>
+                          </div>
+                        )}
+                        {instance.last_healthy && (
+                          <div className={styles.instanceTimestamp}>
+                            {t("general.lastHealthy")}:{" "}
+                            {new Date(instance.last_healthy * 1000).toLocaleString()}
+                            <span className={styles.instanceRelativeTime}>
+                              ({formatRelativeTime(instance.last_healthy, t)})
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className={styles.instanceActions}>
+                        <Flex align="center" gap={4}>
+                          <Typography.Text type="secondary">API:</Typography.Text>
+                          <Typography.Text>{instance.version ?? t("general.na")}</Typography.Text>
+                        </Flex>
+                        <Badge
+                          status={instance.healthy ? "success" : "error"}
+                          text={
+                            <span
+                              className={
+                                instance.healthy ? styles.healthyStatus : styles.unhealthyStatus
+                              }
+                            >
+                              {instance.healthy ? t("general.healthy") : t("general.unhealthy")}
+                            </span>
+                          }
+                        />
+                        <Popconfirm
+                          title={t("general.deleteInstance")}
+                          description={t("general.areYouSureDeleteInstance")}
+                          onConfirm={() => deleteInstance(selectedService, instance.id)}
+                          okText={t("general.yes")}
+                          cancelText={t("general.no")}
+                        >
+                          <Button danger className={styles.btnDelete}>
+                            {t("general.delete")}
+                          </Button>
+                        </Popconfirm>
+                        <Button className={styles.btnDetails}>API</Button>
+                      </div>
+                    </div>
+                  </List.Item>
+                )}
+              />
+            </div>
           </Modal>
         )}
       </div>

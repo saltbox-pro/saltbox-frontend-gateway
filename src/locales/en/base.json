@@ -4,7 +4,7 @@
     "vendor": "Vendor",
     "type": "Type",
     "instances": "Instances",
-    "serviceTitle": "Service: {{name}}",
+    "serviceTitle": "{{name}}",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "instancesCount": "Instances ({{count}})",
@@ -35,6 +35,22 @@
     "disableService": "Disable service",
     "enableService": "Enable service",
     "areYouSureDisableService": "Are you sure you want to disable this service?",
-    "areYouSureEnableService": "Are you sure you want to enable this service?"
+    "areYouSureEnableService": "Are you sure you want to enable this service?",
+    "refresh": "Refresh",
+    "running": "Running",
+    "stopped": "Stopped",
+    "balancing": "Balancing",
+    "basicInfo": "Basic Information",
+    "serviceName": "Service Name",
+    "state": "State",
+    "stateEnabled": "Enabled",
+    "stateDisabled": "Disabled",
+    "justNow": "Just now",
+    "minutesAgo": "{{n}} min ago",
+    "hoursAgo": "{{n}} h ago",
+    "daysAgo": "{{n}} d ago",
+    "official": "OFFICIAL",
+    "thirdParty": "THIRD-PARTY",
+    "description": "Description"
   }
 }

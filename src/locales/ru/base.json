@@ -1,13 +1,13 @@
 {
   "general": {
     "title": "Основное",
-    "vendor": "Разработчик",
+    "vendor": "Поставщик",
     "type": "Тип",
-    "instances": "Экземпляры",
-    "serviceTitle": "Сервис: {{name}}",
+    "instances": "Инстансы",
+    "serviceTitle": "{{name}}",
     "enabled": "Включено",
     "disabled": "Выключено",
-    "instancesCount": "Экземпляры ({{count}})",
+    "instancesCount": "Инстансы ({{count}})",
     "details": "Подробнее",
     "version": "Версия",
     "versionWithValue": "Версия: {{version}}",
@@ -35,6 +35,22 @@
     "disableService": "Отключить сервис",
     "enableService": "Включить сервис",
     "areYouSureDisableService": "Вы уверены, что хотите отключить этот сервис?",
-    "areYouSureEnableService": "Вы уверены, что хотите включить этот сервис?"
+    "areYouSureEnableService": "Вы уверены, что хотите включить этот сервис?",
+    "refresh": "Обновить",
+    "running": "Запущен",
+    "stopped": "Остановлен",
+    "balancing": "Балансировка",
+    "basicInfo": "Основная информация",
+    "serviceName": "Имя сервиса",
+    "state": "Состояние",
+    "stateEnabled": "Включён",
+    "stateDisabled": "Выключен",
+    "justNow": "Только что",
+    "minutesAgo": "{{n}} мин. назад",
+    "hoursAgo": "{{n}} ч. назад",
+    "daysAgo": "{{n}} д. назад",
+    "official": "Официальный",
+    "thirdParty": "Сторонний",
+    "description": "Описание"
   }
 }
