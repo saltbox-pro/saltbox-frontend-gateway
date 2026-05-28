@@ -190,7 +190,7 @@
   justify-content: space-between;
   gap: 16px;
   width: 100%;
-  padding: 8px 4px;
+  padding: 8px;
   background-color: #fafafa;
   border-radius: var(--ant-border-radius, 6px);
   border-left: 4px solid var(--ant-color-split, #f0f0f0);

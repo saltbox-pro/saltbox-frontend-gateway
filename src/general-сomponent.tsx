@@ -16,7 +16,7 @@ import {
   ServiceSchemaOutput,
   ServiceType,
 } from "@saltbox/saltbox-gateway-api-client";
-import { Badge, Button, Card, Flex, List, Popconfirm, Select, Tag, Typography } from "antd";
+import { Badge, Button, Card, Flex, List, Popconfirm, Select, Switch, Tag, Typography } from "antd";
 import { TFunction } from "i18next";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -432,7 +432,7 @@ export const GeneralComponent = () => {
                       </div>
 
                       <div className={styles.instanceExtraInfo}>
-                        <Flex gap={8}>
+                        <Flex align="center" gap={8}>
                           <Badge
                             status={instance.healthy ? "success" : "error"}
                             text={
@@ -449,25 +449,23 @@ export const GeneralComponent = () => {
                             <Typography.Text type="secondary">API:</Typography.Text>
                             <Typography.Text>{instance.version ?? t("general.na")}</Typography.Text>
                           </Flex>
+                          <Switch />
                         </Flex>
-                        <div className={styles.instanceActions}>
-                          <Popconfirm
-                            title={t("general.deleteInstance")}
-                            description={t("general.areYouSureDeleteInstance")}
-                            onConfirm={() => deleteInstance(selectedService, instance.id)}
-                            okText={t("general.yes")}
-                            cancelText={t("general.no")}
+                        <Popconfirm
+                          title={t("general.deleteInstance")}
+                          description={t("general.areYouSureDeleteInstance")}
+                          onConfirm={() => deleteInstance(selectedService, instance.id)}
+                          okText={t("general.yes")}
+                          cancelText={t("general.no")}
+                        >
+                          <Button
+                            danger
+                            className={styles.btnDelete}
+                            disabled={selectedService.instances.length <= 1}
                           >
-                            <Button
-                              danger
-                              className={styles.btnDelete}
-                              disabled={selectedService.instances.length <= 1}
-                            >
-                              {t("general.delete")}
-                            </Button>
-                          </Popconfirm>
-                          <Button>API</Button>
-                        </div>
+                            {t("general.delete")}
+                          </Button>
+                        </Popconfirm>
                       </div>
                     </div>
                   </List.Item>
