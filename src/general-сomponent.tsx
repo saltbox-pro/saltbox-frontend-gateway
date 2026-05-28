@@ -14,7 +14,7 @@ import {
   ProxyBalancingStrategy,
   ServiceInstanceOutput,
   ServiceSchemaOutput,
-  ServiceType,
+  ServiceSchemaOutputTypeEnum,
 } from "@saltbox/saltbox-gateway-api-client";
 import { Badge, Button, Card, Flex, List, Popconfirm, Select, Switch, Tag, Typography } from "antd";
 import { TFunction } from "i18next";
@@ -35,9 +35,19 @@ const BALANCING_OPTIONS = (
   Object.entries(BALANCING_LABELS) as [ProxyBalancingStrategy, string][]
 ).map(([value, label]) => ({ value, label }));
 
-const SERVICE_TYPE_COLORS: Record<ServiceType, string> = {
-  [ServiceType.Official]: "blue",
-  [ServiceType.ThirdParty]: "default",
+const SERVICE_TYPE_COLORS: Record<ServiceSchemaOutputTypeEnum, string> = {
+  [ServiceSchemaOutputTypeEnum.Official]: "blue",
+  [ServiceSchemaOutputTypeEnum.ThirdParty]: "default",
+};
+
+const METHOD_COLORS: Record<string, string> = {
+  GET: "green",
+  POST: "orange",
+  PUT: "blue",
+  DELETE: "red",
+  PATCH: "gold",
+  HEAD: "cyan",
+  OPTIONS: "purple",
 };
 
 const getServiceStatus = (service: ServiceSchemaOutput): "running" | "stopped" => {
@@ -97,7 +107,7 @@ const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: Servic
           <div className={styles.cardTags}>
             <Tag>{service.name}</Tag>
             <Tag color={SERVICE_TYPE_COLORS[service.type]}>
-              {service.type === ServiceType.Official
+              {service.type === ServiceSchemaOutputTypeEnum.Official
                 ? t("general.official")
                 : t("general.thirdParty")}
             </Tag>
@@ -178,6 +188,7 @@ export const GeneralComponent = () => {
   const { t } = useTranslation();
   const [isServicesLoading, setIsServicesLoading] = useState(true);
   const [selectedService, setSelectedService] = useState<ServiceSchemaOutput | null>(null);
+  const [activeApiInstanceId, setActiveApiInstanceId] = useState<string | null>(null);
   const [modal, contextHolder] = Modal.useModal();
 
   const fetchServices = useCallback(() => {
@@ -302,7 +313,10 @@ export const GeneralComponent = () => {
               </span>
             }
             open={!!selectedService}
-            onCancel={() => setSelectedService(null)}
+            onCancel={() => {
+              setSelectedService(null);
+              setActiveApiInstanceId(null);
+            }}
             footer={[
               <Button key="close" onClick={() => setSelectedService(null)}>
                 {t("general.close")}
@@ -346,7 +360,7 @@ export const GeneralComponent = () => {
                     {t("general.type").toUpperCase()}:
                   </Typography.Text>
                   <Tag color={SERVICE_TYPE_COLORS[selectedService.type]}>
-                    {selectedService.type === ServiceType.Official
+                    {selectedService.type === ServiceSchemaOutputTypeEnum.Official
                       ? t("general.official")
                       : t("general.thirdParty")}
                   </Tag>
@@ -400,73 +414,126 @@ export const GeneralComponent = () => {
                 dataSource={selectedService.instances}
                 renderItem={(instance: ServiceInstanceOutput) => (
                   <List.Item>
-                    <div className={styles.instanceRow}>
-                      <div className={styles.instanceInfo}>
-                        <div className={styles.instanceTitleRow}>
-                          <GlobalOutlined className={styles.instanceIcon} />
-                          <div>
-                            <div className={styles.instanceId}>(id: {instance.id})</div>
-                            <div className={styles.instanceHost}>
-                              {instance.host}:{instance.port}
+                    <div className={styles.instanceCard}>
+                      <div className={styles.instanceRow}>
+                        <div className={styles.instanceInfo}>
+                          <div className={styles.instanceTitleRow}>
+                            <GlobalOutlined className={styles.instanceIcon} />
+                            <div>
+                              <div className={styles.instanceId}>(id: {instance.id})</div>
+                              <div className={styles.instanceHost}>
+                                {instance.host}:{instance.port}
+                              </div>
                             </div>
                           </div>
+                          {instance.last_check && (
+                            <div className={styles.instanceTimestamp}>
+                              {t("general.lastCheck")}:{" "}
+                              {new Date(instance.last_check * 1000).toLocaleString()}
+                              <span className={styles.instanceRelativeTime}>
+                                ({formatRelativeTime(instance.last_check, t)})
+                              </span>
+                            </div>
+                          )}
+                          {instance.last_healthy && (
+                            <div className={styles.instanceTimestamp}>
+                              {t("general.lastHealthy")}:{" "}
+                              {new Date(instance.last_healthy * 1000).toLocaleString()}
+                              <span className={styles.instanceRelativeTime}>
+                                ({formatRelativeTime(instance.last_healthy, t)})
+                              </span>
+                            </div>
+                          )}
                         </div>
-                        {instance.last_check && (
-                          <div className={styles.instanceTimestamp}>
-                            {t("general.lastCheck")}:{" "}
-                            {new Date(instance.last_check * 1000).toLocaleString()}
-                            <span className={styles.instanceRelativeTime}>
-                              ({formatRelativeTime(instance.last_check, t)})
-                            </span>
-                          </div>
-                        )}
-                        {instance.last_healthy && (
-                          <div className={styles.instanceTimestamp}>
-                            {t("general.lastHealthy")}:{" "}
-                            {new Date(instance.last_healthy * 1000).toLocaleString()}
-                            <span className={styles.instanceRelativeTime}>
-                              ({formatRelativeTime(instance.last_healthy, t)})
-                            </span>
-                          </div>
-                        )}
+
+                        <div className={styles.instanceExtraInfo}>
+                          <Flex align="center" gap={8}>
+                            <Badge
+                              status={instance.healthy ? "success" : "error"}
+                              text={
+                                <span
+                                  className={
+                                    instance.healthy ? styles.healthyStatus : styles.unhealthyStatus
+                                  }
+                                >
+                                  {instance.healthy ? t("general.healthy") : t("general.unhealthy")}
+                                </span>
+                              }
+                            />
+                            <Flex align="center" gap={4}>
+                              <Typography.Text type="secondary">API:</Typography.Text>
+                              <Typography.Text>
+                                {instance.version ?? t("general.na")}
+                              </Typography.Text>
+                            </Flex>
+                            <Switch
+                              onChange={() =>
+                                setActiveApiInstanceId((id) =>
+                                  id === instance.id ? null : instance.id
+                                )
+                              }
+                            />
+                          </Flex>
+                          <Popconfirm
+                            title={t("general.deleteInstance")}
+                            description={t("general.areYouSureDeleteInstance")}
+                            onConfirm={() => deleteInstance(selectedService, instance.id)}
+                            okText={t("general.yes")}
+                            cancelText={t("general.no")}
+                          >
+                            <Button
+                              danger
+                              className={styles.btnDelete}
+                              disabled={selectedService.instances.length <= 1}
+                            >
+                              {t("general.delete")}
+                            </Button>
+                          </Popconfirm>
+                        </div>
                       </div>
 
-                      <div className={styles.instanceExtraInfo}>
-                        <Flex align="center" gap={8}>
-                          <Badge
-                            status={instance.healthy ? "success" : "error"}
-                            text={
-                              <span
-                                className={
-                                  instance.healthy ? styles.healthyStatus : styles.unhealthyStatus
-                                }
-                              >
-                                {instance.healthy ? t("general.healthy") : t("general.unhealthy")}
-                              </span>
-                            }
-                          />
-                          <Flex align="center" gap={4}>
-                            <Typography.Text type="secondary">API:</Typography.Text>
-                            <Typography.Text>{instance.version ?? t("general.na")}</Typography.Text>
-                          </Flex>
-                          <Switch />
-                        </Flex>
-                        <Popconfirm
-                          title={t("general.deleteInstance")}
-                          description={t("general.areYouSureDeleteInstance")}
-                          onConfirm={() => deleteInstance(selectedService, instance.id)}
-                          okText={t("general.yes")}
-                          cancelText={t("general.no")}
-                        >
-                          <Button
-                            danger
-                            className={styles.btnDelete}
-                            disabled={selectedService.instances.length <= 1}
-                          >
-                            {t("general.delete")}
-                          </Button>
-                        </Popconfirm>
-                      </div>
+                      {activeApiInstanceId === instance.id &&
+                        (instance.endpoints?.length ?? 0) > 0 && (
+                          <div className={styles.endpointsSection}>
+                            <div className={styles.endpointsSectionTitle}>
+                              <Typography.Text strong>
+                                {t("general.endpointsCount", {
+                                  count: instance.endpoints!.length,
+                                })}
+                              </Typography.Text>
+                            </div>
+                            <div className={styles.endpointsSectionList}>
+                              {instance.endpoints!.map((endpoint, idx) => (
+                                <div key={idx} className={styles.endpointItem}>
+                                  <div className={styles.endpointTopRow}>
+                                    <Tag
+                                      color={
+                                        METHOD_COLORS[endpoint.method.toUpperCase()] ?? "default"
+                                      }
+                                      className={styles.endpointMethodTag}
+                                    >
+                                      {endpoint.method.toUpperCase()}
+                                    </Tag>
+                                    <code className={styles.endpointPath}>{endpoint.path}</code>
+                                    <span className={styles.endpointСacheInfo}>
+                                      {endpoint.cache_ttl
+                                        ? `${endpoint.cache_ttl}s cache`
+                                        : "No cache"}
+                                    </span>
+                                  </div>
+                                  {endpoint.summary && (
+                                    <div className={styles.endpointSummary}>{endpoint.summary}</div>
+                                  )}
+                                  {endpoint.description && (
+                                    <div className={styles.endpointDescription}>
+                                      {endpoint.description}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                     </div>
                   </List.Item>
                 )}

@@ -51,6 +51,7 @@
     "daysAgo": "{{n}} д. назад",
     "official": "Официальный",
     "thirdParty": "Сторонний",
-    "description": "Описание"
+    "description": "Описание",
+    "endpointsCount": "Эндпоинты ({{count}})"
   }
 }

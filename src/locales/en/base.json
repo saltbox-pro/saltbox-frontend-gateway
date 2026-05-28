@@ -51,6 +51,7 @@
     "daysAgo": "{{n}} d ago",
     "official": "OFFICIAL",
     "thirdParty": "THIRD-PARTY",
-    "description": "Description"
+    "description": "Description",
+    "endpointsCount": "Endpoints ({{count}})"
   }
 }
