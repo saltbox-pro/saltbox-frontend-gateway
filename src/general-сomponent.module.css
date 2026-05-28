@@ -160,6 +160,11 @@
   color: #fff !important;
 }
 
+.btnDelete:disabled {
+  background-color: transparent !important;
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45)) !important;
+}
+
 .modalTitle {
   display: flex;
   align-items: center;

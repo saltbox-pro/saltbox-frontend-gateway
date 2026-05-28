@@ -467,7 +467,11 @@ export const GeneralComponent = () => {
                           okText={t("general.yes")}
                           cancelText={t("general.no")}
                         >
-                          <Button danger className={styles.btnDelete}>
+                          <Button
+                            danger
+                            className={styles.btnDelete}
+                            disabled={selectedService.instances.length <= 1}
+                          >
                             {t("general.delete")}
                           </Button>
                         </Popconfirm>
