@@ -63,16 +63,6 @@
   flex-shrink: 0;
 }
 
-.statusIconRunning {
-  font-size: 18px;
-  color: var(--ant-color-success, #52c41a);
-}
-
-.statusIconStopped {
-  font-size: 18px;
-  color: var(--ant-color-error, #ff4d4f);
-}
-
 .statusRunning {
   color: var(--ant-color-success, #52c41a);
   font-weight: 600;
@@ -129,30 +119,9 @@
   justify-content: flex-start;
 }
 
-.btnRefresh {
-  background-color: #52c41a;
-  color: #fff;
-}
-
-.btnRefresh:hover {
-  background-color: #45a514 !important;
-}
-
 .btnDisable:hover {
   background-color: #d9363e !important;
   border-color: #d9363e !important;
-}
-
-.btnDetails {
-  background-color: var(--ant-color-text-heading, #434343);
-  border-color: var(--ant-color-text-heading, #434343);
-  color: #fff;
-}
-
-.btnDetails:hover {
-  background-color: var(--ant-color-text, #262626) !important;
-  border-color: var(--ant-color-text, #262626) !important;
-  color: #fff !important;
 }
 
 .btnDelete:hover {
@@ -219,7 +188,6 @@
 .instanceRow {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
   gap: 16px;
   width: 100%;
   padding: 8px 4px;
@@ -267,7 +235,7 @@
 }
 
 .instanceRelativeTime {
-  color: var(--ant-color-primary, #52c41a);
+  color: var(--ant-color-primary, #91caff);
   margin-left: 2px;
 }
 
@@ -276,6 +244,14 @@
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
+}
+
+.instanceExtraInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 4px;
 }
 
 .healthyStatus {

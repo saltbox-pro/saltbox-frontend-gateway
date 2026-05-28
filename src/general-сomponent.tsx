@@ -35,9 +35,9 @@ const BALANCING_OPTIONS = (
   Object.entries(BALANCING_LABELS) as [ProxyBalancingStrategy, string][]
 ).map(([value, label]) => ({ value, label }));
 
-const TYPE_COLORS: Record<ServiceType, string> = {
-  [ServiceType.Official]: "green",
-  [ServiceType.ThirdParty]: "purple",
+const SERVICE_TYPE_COLORS: Record<ServiceType, string> = {
+  [ServiceType.Official]: "blue",
+  [ServiceType.ThirdParty]: "default",
 };
 
 const getServiceStatus = (service: ServiceSchemaOutput): "running" | "stopped" => {
@@ -58,6 +58,16 @@ const formatRelativeTime = (timestamp: number, t: TFunction): string => {
   return t("general.daysAgo", { n: Math.floor(diff / 86400) });
 };
 
+const ServiceStatusTag = ({ service }: { service: ServiceSchemaOutput }) => {
+  const { t } = useTranslation();
+  const status = getServiceStatus(service);
+  return (
+    <Tag color={status === "running" ? "green" : "red"}>
+      {t(status === "running" ? "general.running" : "general.stopped")}
+    </Tag>
+  );
+};
+
 type ServiceCardProps = {
   service: ServiceSchemaOutput;
   onToggle: (service: ServiceSchemaOutput) => void;
@@ -67,7 +77,6 @@ type ServiceCardProps = {
 
 const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: ServiceCardProps) => {
   const { t } = useTranslation();
-  const status = getServiceStatus(service);
   const healthyCount = getHealthyCount(service);
   const total = service.instances.length;
 
@@ -82,24 +91,12 @@ const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: Servic
                 {service.title || service.name}
               </Typography.Text>
             </div>
-            <div className={styles.statusBadge}>
-              {status === "running" ? (
-                <>
-                  <span className={styles.statusRunning}>{t("general.running")}</span>
-                  <CheckCircleFilled className={styles.statusIconRunning} />
-                </>
-              ) : (
-                <>
-                  <span className={styles.statusStopped}>{t("general.stopped")}</span>
-                  <ExclamationCircleOutlined className={styles.statusIconStopped} />
-                </>
-              )}
-            </div>
+            <ServiceStatusTag service={service} />
           </div>
 
           <div className={styles.cardTags}>
             <Tag>{service.name}</Tag>
-            <Tag color={TYPE_COLORS[service.type]}>
+            <Tag color={SERVICE_TYPE_COLORS[service.type]}>
               {service.type === ServiceType.Official
                 ? t("general.official")
                 : t("general.thirdParty")}
@@ -163,7 +160,6 @@ const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: Servic
           </Button>
           <Button
             icon={<EyeOutlined />}
-            className={styles.btnDetails}
             onClick={(e) => {
               e.stopPropagation();
               onDetails(service);
@@ -277,7 +273,6 @@ export const GeneralComponent = () => {
             type="primary"
             icon={<SyncOutlined />}
             loading={isServicesLoading}
-            className={styles.btnRefresh}
             onClick={fetchServices}
           >
             {t("general.refresh")}
@@ -309,6 +304,9 @@ export const GeneralComponent = () => {
             open={!!selectedService}
             onCancel={() => setSelectedService(null)}
             footer={[
+              <Button key="close" onClick={() => setSelectedService(null)}>
+                {t("general.close")}
+              </Button>,
               <Button
                 key="delete"
                 danger
@@ -327,9 +325,6 @@ export const GeneralComponent = () => {
                 }}
               >
                 {t("general.deleteService")}
-              </Button>,
-              <Button key="close" onClick={() => setSelectedService(null)}>
-                {t("general.close")}
               </Button>,
             ]}
             width={900}
@@ -350,7 +345,7 @@ export const GeneralComponent = () => {
                   <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
                     {t("general.type").toUpperCase()}:
                   </Typography.Text>
-                  <Tag color={TYPE_COLORS[selectedService.type]}>
+                  <Tag color={SERVICE_TYPE_COLORS[selectedService.type]}>
                     {selectedService.type === ServiceType.Official
                       ? t("general.official")
                       : t("general.thirdParty")}
@@ -366,14 +361,7 @@ export const GeneralComponent = () => {
                   <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
                     {t("general.state").toUpperCase()}:
                   </Typography.Text>
-                  <Badge
-                    status={selectedService.enabled ? "success" : "error"}
-                    text={
-                      selectedService.enabled
-                        ? t("general.stateEnabled")
-                        : t("general.stateDisabled")
-                    }
-                  />
+                  <ServiceStatusTag service={selectedService} />
                 </div>
                 <div className={styles.basicInfoItem}>
                   <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
@@ -443,39 +431,43 @@ export const GeneralComponent = () => {
                         )}
                       </div>
 
-                      <div className={styles.instanceActions}>
-                        <Flex align="center" gap={4}>
-                          <Typography.Text type="secondary">API:</Typography.Text>
-                          <Typography.Text>{instance.version ?? t("general.na")}</Typography.Text>
+                      <div className={styles.instanceExtraInfo}>
+                        <Flex gap={8}>
+                          <Badge
+                            status={instance.healthy ? "success" : "error"}
+                            text={
+                              <span
+                                className={
+                                  instance.healthy ? styles.healthyStatus : styles.unhealthyStatus
+                                }
+                              >
+                                {instance.healthy ? t("general.healthy") : t("general.unhealthy")}
+                              </span>
+                            }
+                          />
+                          <Flex align="center" gap={4}>
+                            <Typography.Text type="secondary">API:</Typography.Text>
+                            <Typography.Text>{instance.version ?? t("general.na")}</Typography.Text>
+                          </Flex>
                         </Flex>
-                        <Badge
-                          status={instance.healthy ? "success" : "error"}
-                          text={
-                            <span
-                              className={
-                                instance.healthy ? styles.healthyStatus : styles.unhealthyStatus
-                              }
-                            >
-                              {instance.healthy ? t("general.healthy") : t("general.unhealthy")}
-                            </span>
-                          }
-                        />
-                        <Popconfirm
-                          title={t("general.deleteInstance")}
-                          description={t("general.areYouSureDeleteInstance")}
-                          onConfirm={() => deleteInstance(selectedService, instance.id)}
-                          okText={t("general.yes")}
-                          cancelText={t("general.no")}
-                        >
-                          <Button
-                            danger
-                            className={styles.btnDelete}
-                            disabled={selectedService.instances.length <= 1}
+                        <div className={styles.instanceActions}>
+                          <Popconfirm
+                            title={t("general.deleteInstance")}
+                            description={t("general.areYouSureDeleteInstance")}
+                            onConfirm={() => deleteInstance(selectedService, instance.id)}
+                            okText={t("general.yes")}
+                            cancelText={t("general.no")}
                           >
-                            {t("general.delete")}
-                          </Button>
-                        </Popconfirm>
-                        <Button className={styles.btnDetails}>API</Button>
+                            <Button
+                              danger
+                              className={styles.btnDelete}
+                              disabled={selectedService.instances.length <= 1}
+                            >
+                              {t("general.delete")}
+                            </Button>
+                          </Popconfirm>
+                          <Button>API</Button>
+                        </div>
                       </div>
                     </div>
                   </List.Item>
