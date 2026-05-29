@@ -1,6 +1,4 @@
 import {
-  CheckCircleFilled,
-  ExclamationCircleOutlined,
   EyeOutlined,
   GlobalOutlined,
   HddOutlined,
@@ -14,7 +12,7 @@ import {
   ProxyBalancingStrategy,
   ServiceInstanceOutput,
   ServiceSchemaOutput,
-  ServiceType,
+  ServiceSchemaOutputTypeEnum,
 } from "@saltbox/saltbox-gateway-api-client";
 import { Badge, Button, Card, Flex, List, Popconfirm, Select, Switch, Tag, Typography } from "antd";
 import { TFunction } from "i18next";
@@ -35,15 +33,25 @@ const BALANCING_OPTIONS = (
   Object.entries(BALANCING_LABELS) as [ProxyBalancingStrategy, string][]
 ).map(([value, label]) => ({ value, label }));
 
-const SERVICE_TYPE_COLORS: Record<ServiceType, string> = {
-  [ServiceType.Official]: "blue",
-  [ServiceType.ThirdParty]: "default",
+const SERVICE_TYPE_COLORS: Record<ServiceSchemaOutputTypeEnum, string> = {
+  [ServiceSchemaOutputTypeEnum.Official]: "blue",
+  [ServiceSchemaOutputTypeEnum.ThirdParty]: "default",
+};
+
+const METHOD_COLORS: Record<string, string> = {
+  GET: "blue",
+  POST: "green",
+  PUT: "orange",
+  DELETE: "red",
+  PATCH: "gold",
+  HEAD: "purple",
+  OPTIONS: "default",
 };
 
 const getServiceStatus = (service: ServiceSchemaOutput): "running" | "stopped" => {
   if (!service || !service.enabled || service.instances.length === 0) return "stopped";
-  const healthyCount = service.instances.filter((i) => i.healthy).length;
-  return healthyCount > 0 ? "running" : "stopped";
+  const healthyInstanceCount = service.instances.filter((i) => i.healthy).length;
+  return healthyInstanceCount > 0 ? "running" : "stopped";
 };
 
 const getHealthyCount = (service: ServiceSchemaOutput): number => {
@@ -77,8 +85,8 @@ type ServiceCardProps = {
 
 const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: ServiceCardProps) => {
   const { t } = useTranslation();
-  const healthyCount = getHealthyCount(service);
-  const total = service.instances.length;
+  const healthyInstanceCount = getHealthyCount(service);
+  const totalInstance = service.instances.length;
 
   return (
     <List.Item>
@@ -97,7 +105,7 @@ const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: Servic
           <div className={styles.cardTags}>
             <Tag>{service.name}</Tag>
             <Tag color={SERVICE_TYPE_COLORS[service.type]}>
-              {service.type === ServiceType.Official
+              {service.type === ServiceSchemaOutputTypeEnum.Official
                 ? t("general.official")
                 : t("general.thirdParty")}
             </Tag>
@@ -123,7 +131,7 @@ const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: Servic
             <span>
               <Typography.Text type="secondary">{t("general.instances")}: </Typography.Text>
               <Typography.Text>
-                {healthyCount}/{total}
+                {healthyInstanceCount}/{totalInstance}
               </Typography.Text>
             </span>
           </div>
@@ -140,6 +148,7 @@ const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: Servic
               size="small"
               value={service.load_balancing_strategy ?? ProxyBalancingStrategy.Rr}
               options={BALANCING_OPTIONS}
+              disabled={totalInstance <= 1}
               onChange={(val) => onChangeBalancing(service, val)}
             />
           </div>
@@ -346,7 +355,7 @@ export const GeneralComponent = () => {
                     {t("general.type").toUpperCase()}:
                   </Typography.Text>
                   <Tag color={SERVICE_TYPE_COLORS[selectedService.type]}>
-                    {selectedService.type === ServiceType.Official
+                    {selectedService.type === ServiceSchemaOutputTypeEnum.Official
                       ? t("general.official")
                       : t("general.thirdParty")}
                   </Tag>
