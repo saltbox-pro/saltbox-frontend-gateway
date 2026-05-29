@@ -1,6 +1,4 @@
 import {
-  CheckCircleFilled,
-  ExclamationCircleOutlined,
   EyeOutlined,
   GlobalOutlined,
   HddOutlined,
@@ -9,7 +7,7 @@ import {
   SettingOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { PageHeader, Modal } from "@saltbox/saltbox-frontend-common";
+import { InfoDescriptions, PageHeader, Modal } from "@saltbox/saltbox-frontend-common";
 import {
   ProxyBalancingStrategy,
   ServiceInstanceOutput,
@@ -41,19 +39,19 @@ const SERVICE_TYPE_COLORS: Record<ServiceSchemaOutputTypeEnum, string> = {
 };
 
 const METHOD_COLORS: Record<string, string> = {
-  GET: "green",
-  POST: "orange",
-  PUT: "blue",
+  GET: "blue",
+  POST: "green",
+  PUT: "orange",
   DELETE: "red",
   PATCH: "gold",
-  HEAD: "cyan",
-  OPTIONS: "purple",
+  HEAD: "purple",
+  OPTIONS: "default",
 };
 
 const getServiceStatus = (service: ServiceSchemaOutput): "running" | "stopped" => {
   if (!service || !service.enabled || service.instances.length === 0) return "stopped";
-  const healthyCount = service.instances.filter((i) => i.healthy).length;
-  return healthyCount > 0 ? "running" : "stopped";
+  const healthyInstanceCount = service.instances.filter((i) => i.healthy).length;
+  return healthyInstanceCount > 0 ? "running" : "stopped";
 };
 
 const getHealthyCount = (service: ServiceSchemaOutput): number => {
@@ -87,8 +85,8 @@ type ServiceCardProps = {
 
 const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: ServiceCardProps) => {
   const { t } = useTranslation();
-  const healthyCount = getHealthyCount(service);
-  const total = service.instances.length;
+  const healthyInstanceCount = getHealthyCount(service);
+  const totalInstance = service.instances.length;
 
   return (
     <List.Item>
@@ -133,7 +131,7 @@ const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: Servic
             <span>
               <Typography.Text type="secondary">{t("general.instances")}: </Typography.Text>
               <Typography.Text>
-                {healthyCount}/{total}
+                {healthyInstanceCount}/{totalInstance}
               </Typography.Text>
             </span>
           </div>
@@ -150,6 +148,7 @@ const ServiceCard = ({ service, onToggle, onDetails, onChangeBalancing }: Servic
               size="small"
               value={service.load_balancing_strategy ?? ProxyBalancingStrategy.Rr}
               options={BALANCING_OPTIONS}
+              disabled={totalInstance <= 1}
               onChange={(val) => onChangeBalancing(service, val)}
             />
           </div>
@@ -272,6 +271,43 @@ export const GeneralComponent = () => {
     [modal, t, toggleService]
   );
 
+  const basicInfoItems = selectedService
+    ? [
+        {
+          key: "name",
+          label: t("general.serviceName"),
+          children: <Tag>{selectedService.name}</Tag>,
+        },
+        {
+          key: "type",
+          label: t("general.type"),
+          children: (
+            <Tag color={SERVICE_TYPE_COLORS[selectedService.type]}>
+              {selectedService.type === ServiceSchemaOutputTypeEnum.Official
+                ? t("general.official")
+                : t("general.thirdParty")}
+            </Tag>
+          ),
+        },
+        {
+          key: "vendor",
+          label: t("general.vendor"),
+          children: selectedService.vendor,
+        },
+        {
+          key: "state",
+          label: t("general.state"),
+          children: <ServiceStatusTag service={selectedService} />,
+        },
+        {
+          key: "balancing",
+          label: t("general.balancing"),
+          children:
+            BALANCING_LABELS[selectedService.load_balancing_strategy ?? ProxyBalancingStrategy.Rr],
+        },
+      ]
+    : [];
+
   return (
     <>
       {contextHolder}
@@ -348,48 +384,7 @@ export const GeneralComponent = () => {
                 <SettingOutlined />
                 <Typography.Text strong>{t("general.basicInfo")}</Typography.Text>
               </div>
-              <div className={styles.basicInfoGrid}>
-                <div className={styles.basicInfoItem}>
-                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
-                    {t("general.serviceName").toUpperCase()}:
-                  </Typography.Text>
-                  <Tag>{selectedService.name}</Tag>
-                </div>
-                <div className={styles.basicInfoItem}>
-                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
-                    {t("general.type").toUpperCase()}:
-                  </Typography.Text>
-                  <Tag color={SERVICE_TYPE_COLORS[selectedService.type]}>
-                    {selectedService.type === ServiceSchemaOutputTypeEnum.Official
-                      ? t("general.official")
-                      : t("general.thirdParty")}
-                  </Tag>
-                </div>
-                <div className={styles.basicInfoItem}>
-                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
-                    {t("general.vendor").toUpperCase()}:
-                  </Typography.Text>
-                  <Typography.Text>{selectedService.vendor}</Typography.Text>
-                </div>
-                <div className={styles.basicInfoItem}>
-                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
-                    {t("general.state").toUpperCase()}:
-                  </Typography.Text>
-                  <ServiceStatusTag service={selectedService} />
-                </div>
-                <div className={styles.basicInfoItem}>
-                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
-                    {t("general.balancing").toUpperCase()}:
-                  </Typography.Text>
-                  <Typography.Text>
-                    {
-                      BALANCING_LABELS[
-                        selectedService.load_balancing_strategy ?? ProxyBalancingStrategy.Rr
-                      ]
-                    }
-                  </Typography.Text>
-                </div>
-              </div>
+              <InfoDescriptions items={basicInfoItems} />
             </div>
 
             {selectedService.description && (
