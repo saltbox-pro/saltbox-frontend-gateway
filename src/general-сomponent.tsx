@@ -13,6 +13,9 @@ import {
   ServiceInstanceOutput,
   ServiceSchemaOutput,
   ServiceSchemaOutputTypeEnum,
+  ServiceSchemaOutputFromJSON,
+  ServiceInstanceOutputFromJSON,
+  ServiceEndpointOutputFromJSON,
 } from "@saltbox/saltbox-gateway-api-client";
 import {
   Badge,
@@ -534,6 +537,23 @@ export const GeneralComponent = () => {
                                       {endpoint.description && (
                                         <div className={styles.endpointDescription}>
                                           {endpoint.description}
+                                        </div>
+                                      )}
+                                      {(endpoint.opa_config?.x_opa_action ||
+                                        endpoint.opa_config?.x_opa_policy) && (
+                                        <div className={styles.endpointOpa}>
+                                          {endpoint.opa_config.x_opa_action && (
+                                            <Tag className={styles.endpointOpaTag}>
+                                              {t("general.opaAction")}:{" "}
+                                              {endpoint.opa_config.x_opa_action}
+                                            </Tag>
+                                          )}
+                                          {endpoint.opa_config.x_opa_policy && (
+                                            <Tag className={styles.endpointOpaTag}>
+                                              {t("general.opaPolicy")}:{" "}
+                                              {endpoint.opa_config.x_opa_policy}
+                                            </Tag>
+                                          )}
                                         </div>
                                       )}
                                     </Tag>

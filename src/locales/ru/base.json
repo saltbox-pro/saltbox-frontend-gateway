@@ -52,6 +52,8 @@
     "official": "Официальный",
     "thirdParty": "Сторонний",
     "description": "Описание",
-    "endpointsCount": "Эндпоинты ({{count}})"
+    "endpointsCount": "Эндпоинты ({{count}})",
+    "opaAction": "Действие",
+    "opaPolicy": "Политика"
   }
 }

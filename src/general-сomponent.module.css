@@ -311,3 +311,16 @@
   font-size: 13px;
   font-weight: 600;
 }
+
+.endpointOpa {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.endpointOpaTag {
+  font-size: 11px !important;
+  font-family: monospace;
+  margin: 0 !important;
+}

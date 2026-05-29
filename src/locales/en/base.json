@@ -52,6 +52,8 @@
     "official": "OFFICIAL",
     "thirdParty": "THIRD-PARTY",
     "description": "Description",
-    "endpointsCount": "Endpoints ({{count}})"
+    "endpointsCount": "Endpoints ({{count}})",
+    "opaAction": "action",
+    "opaPolicy": "policy"
   }
 }
