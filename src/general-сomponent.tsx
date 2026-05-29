@@ -7,7 +7,7 @@ import {
   SettingOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import { PageHeader, Modal } from "@saltbox/saltbox-frontend-common";
+import { InfoDescriptions, PageHeader, Modal } from "@saltbox/saltbox-frontend-common";
 import {
   ProxyBalancingStrategy,
   ServiceInstanceOutput,
@@ -270,6 +270,43 @@ export const GeneralComponent = () => {
     [modal, t, toggleService]
   );
 
+  const basicInfoItems = selectedService
+    ? [
+        {
+          key: "name",
+          label: t("general.serviceName"),
+          children: <Tag>{selectedService.name}</Tag>,
+        },
+        {
+          key: "type",
+          label: t("general.type"),
+          children: (
+            <Tag color={SERVICE_TYPE_COLORS[selectedService.type]}>
+              {selectedService.type === ServiceSchemaOutputTypeEnum.Official
+                ? t("general.official")
+                : t("general.thirdParty")}
+            </Tag>
+          ),
+        },
+        {
+          key: "vendor",
+          label: t("general.vendor"),
+          children: selectedService.vendor,
+        },
+        {
+          key: "state",
+          label: t("general.state"),
+          children: <ServiceStatusTag service={selectedService} />,
+        },
+        {
+          key: "balancing",
+          label: t("general.balancing"),
+          children:
+            BALANCING_LABELS[selectedService.load_balancing_strategy ?? ProxyBalancingStrategy.Rr],
+        },
+      ]
+    : [];
+
   return (
     <>
       {contextHolder}
@@ -343,48 +380,7 @@ export const GeneralComponent = () => {
                 <SettingOutlined />
                 <Typography.Text strong>{t("general.basicInfo")}</Typography.Text>
               </div>
-              <div className={styles.basicInfoGrid}>
-                <div className={styles.basicInfoItem}>
-                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
-                    {t("general.serviceName").toUpperCase()}:
-                  </Typography.Text>
-                  <Tag>{selectedService.name}</Tag>
-                </div>
-                <div className={styles.basicInfoItem}>
-                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
-                    {t("general.type").toUpperCase()}:
-                  </Typography.Text>
-                  <Tag color={SERVICE_TYPE_COLORS[selectedService.type]}>
-                    {selectedService.type === ServiceSchemaOutputTypeEnum.Official
-                      ? t("general.official")
-                      : t("general.thirdParty")}
-                  </Tag>
-                </div>
-                <div className={styles.basicInfoItem}>
-                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
-                    {t("general.vendor").toUpperCase()}:
-                  </Typography.Text>
-                  <Typography.Text>{selectedService.vendor}</Typography.Text>
-                </div>
-                <div className={styles.basicInfoItem}>
-                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
-                    {t("general.state").toUpperCase()}:
-                  </Typography.Text>
-                  <ServiceStatusTag service={selectedService} />
-                </div>
-                <div className={styles.basicInfoItem}>
-                  <Typography.Text type="secondary" className={styles.basicInfoFieldLabel}>
-                    {t("general.balancing").toUpperCase()}:
-                  </Typography.Text>
-                  <Typography.Text>
-                    {
-                      BALANCING_LABELS[
-                        selectedService.load_balancing_strategy ?? ProxyBalancingStrategy.Rr
-                      ]
-                    }
-                  </Typography.Text>
-                </div>
-              </div>
+              <InfoDescriptions items={basicInfoItems} />
             </div>
 
             {selectedService.description && (

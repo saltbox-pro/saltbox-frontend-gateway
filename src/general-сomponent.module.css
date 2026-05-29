@@ -158,28 +158,6 @@
   font-size: 16px;
 }
 
-.basicInfoGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px 28px;
-}
-
-.basicInfoItem {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.basicInfoItem :global(.ant-tag) {
-  font-size: 14px;
-}
-
-.basicInfoFieldLabel {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
-
 .descriptionText {
   margin: 0 !important;
   color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45));
