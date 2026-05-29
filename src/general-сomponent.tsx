@@ -14,7 +14,18 @@ import {
   ServiceSchemaOutput,
   ServiceSchemaOutputTypeEnum,
 } from "@saltbox/saltbox-gateway-api-client";
-import { Badge, Button, Card, Flex, List, Popconfirm, Select, Switch, Tag, Typography } from "antd";
+import {
+  Badge,
+  Button,
+  Card,
+  Collapse,
+  Flex,
+  List,
+  Popconfirm,
+  Select,
+  Tag,
+  Typography,
+} from "antd";
 import { TFunction } from "i18next";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -187,7 +198,6 @@ export const GeneralComponent = () => {
   const { t } = useTranslation();
   const [isServicesLoading, setIsServicesLoading] = useState(true);
   const [selectedService, setSelectedService] = useState<ServiceSchemaOutput | null>(null);
-  const [activeApiInstanceId, setActiveApiInstanceId] = useState<string | null>(null);
   const [modal, contextHolder] = Modal.useModal();
 
   const fetchServices = useCallback(() => {
@@ -351,7 +361,6 @@ export const GeneralComponent = () => {
             open={!!selectedService}
             onCancel={() => {
               setSelectedService(null);
-              setActiveApiInstanceId(null);
             }}
             footer={[
               <Button key="close" onClick={() => setSelectedService(null)}>
@@ -461,13 +470,6 @@ export const GeneralComponent = () => {
                                 {instance.version ?? t("general.na")}
                               </Typography.Text>
                             </Flex>
-                            <Switch
-                              onChange={() =>
-                                setActiveApiInstanceId((id) =>
-                                  id === instance.id ? null : instance.id
-                                )
-                              }
-                            />
                           </Flex>
                           <Popconfirm
                             title={t("general.deleteInstance")}
@@ -487,48 +489,61 @@ export const GeneralComponent = () => {
                         </div>
                       </div>
 
-                      {activeApiInstanceId === instance.id &&
-                        (instance.endpoints?.length ?? 0) > 0 && (
-                          <div className={styles.endpointsSection}>
-                            <div className={styles.endpointsSectionTitle}>
-                              <Typography.Text strong>
-                                {t("general.endpointsCount", {
-                                  count: instance.endpoints!.length,
-                                })}
-                              </Typography.Text>
-                            </div>
-                            <div className={styles.endpointsSectionList}>
-                              {instance.endpoints!.map((endpoint, idx) => (
-                                <div key={idx} className={styles.endpointItem}>
-                                  <div className={styles.endpointTopRow}>
+                      {(instance.endpoints?.length ?? 0) > 0 && (
+                        <Collapse
+                          size="small"
+                          className={styles.endpointsCollapse}
+                          items={[
+                            {
+                              key: "endpoints",
+                              label: t("general.endpointsCount", {
+                                count: instance.endpoints!.length,
+                              }),
+                              children: (
+                                <div className={styles.endpointsSectionList}>
+                                  {instance.endpoints!.map((endpoint, idx) => (
                                     <Tag
                                       color={
                                         METHOD_COLORS[endpoint.method.toUpperCase()] ?? "default"
                                       }
-                                      className={styles.endpointMethodTag}
+                                      key={idx}
+                                      className={styles.endpointItem}
                                     >
-                                      {endpoint.method.toUpperCase()}
+                                      <div className={styles.endpointTopRow}>
+                                        <Tag
+                                          color={
+                                            METHOD_COLORS[endpoint.method.toUpperCase()] ??
+                                            "default"
+                                          }
+                                          className={styles.endpointMethodTag}
+                                        >
+                                          {endpoint.method.toUpperCase()}
+                                        </Tag>
+                                        <code className={styles.endpointPath}>{endpoint.path}</code>
+                                        <span className={styles.endpointСacheInfo}>
+                                          {endpoint.cache_ttl
+                                            ? `${endpoint.cache_ttl}s cache`
+                                            : "No cache"}
+                                        </span>
+                                      </div>
+                                      {endpoint.summary && (
+                                        <div className={styles.endpointSummary}>
+                                          {endpoint.summary}
+                                        </div>
+                                      )}
+                                      {endpoint.description && (
+                                        <div className={styles.endpointDescription}>
+                                          {endpoint.description}
+                                        </div>
+                                      )}
                                     </Tag>
-                                    <code className={styles.endpointPath}>{endpoint.path}</code>
-                                    <span className={styles.endpointСacheInfo}>
-                                      {endpoint.cache_ttl
-                                        ? `${endpoint.cache_ttl}s cache`
-                                        : "No cache"}
-                                    </span>
-                                  </div>
-                                  {endpoint.summary && (
-                                    <div className={styles.endpointSummary}>{endpoint.summary}</div>
-                                  )}
-                                  {endpoint.description && (
-                                    <div className={styles.endpointDescription}>
-                                      {endpoint.description}
-                                    </div>
-                                  )}
+                                  ))}
                                 </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                              ),
+                            },
+                          ]}
+                        />
+                      )}
                     </div>
                   </List.Item>
                 )}

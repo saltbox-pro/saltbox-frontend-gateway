@@ -246,30 +246,19 @@
   border-left: 4px solid var(--ant-color-split, #f0f0f0);
 }
 
-.endpointsSection {
-  display: flex;
-  flex-direction: column;
+.endpointsCollapse {
+  margin-top: 4px;
+}
+
+.endpointsCollapse :global(.ant-collapse-content-box) {
   max-height: 400px;
-  padding-right: 4px;
-  padding-top: 8px;
+  overflow-y: auto;
 }
 
 .endpointsSectionList {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  overflow-y: auto;
-}
-
-.endpointsSectionTitle {
-  width: 100%;
-  padding: 0 0 8px 28px;
-  border-bottom: 1px solid var(--ant-color-split, #f0f0f0);
-  background-color: #fafafa;
-}
-
-.endpointsSectionTitle :global(.ant-typography) {
-  font-size: 15px;
 }
 
 .endpointItem {
@@ -277,9 +266,8 @@
   flex-direction: column;
   gap: 4px;
   padding: 8px 12px;
-  background-color: #f0f5ff;
   border-radius: var(--ant-border-radius, 6px);
-  border-left: 4px solid #1677ff;
+  color: var(--ant-color-text-primary, rgba(0, 0, 0, 0.88)) !important;
 }
 
 .endpointTopRow {
