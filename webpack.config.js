@@ -46,7 +46,10 @@ module.exports = (webpackConfigEnv, argv) => {
     },
     resolve: {
       alias: {
-        "saltbox-gateway": path.resolve(__dirname, "./src"),
+        "@": path.resolve(__dirname, "./src"),
+        "@shared": path.resolve(__dirname, "./src/shared"),
+        "@features": path.resolve(__dirname, "./src/features"),
+        "@app": path.resolve(__dirname, "./src/app"),
       },
     },
     plugins: [

@@ -1,8 +1,8 @@
 import { AppLanguage } from "@saltbox/saltbox-frontend-common";
 import type { Resource } from "i18next";
 
-import enBase from "../locales/en/base.json";
-import ruBase from "../locales/ru/base.json";
+import enBase from "./locales/en/base.json";
+import ruBase from "./locales/ru/base.json";
 
 export const gatewayResources: Resource = {
   [AppLanguage.EN]: { base: enBase },

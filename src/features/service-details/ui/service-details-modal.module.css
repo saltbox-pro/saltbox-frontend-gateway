@@ -1,0 +1,44 @@
+.modalTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+}
+
+.section {
+  margin-top: 22px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ant-color-split, #f0f0f0);
+}
+
+.sectionTitle :global(.ant-typography) {
+  font-size: 16px;
+}
+
+.sectionTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sectionDescription {
+  margin: 0 !important;
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45));
+}
+
+.sectionTitleActionsToggle:hover {
+  color: var(--ant-color-error, #ff4d4f) !important;
+}
+
+.sectionTitleActionsDelete:hover {
+  background-color: var(--ant-color-error, #ff4d4f) !important;
+  color: #fff !important;
+}
