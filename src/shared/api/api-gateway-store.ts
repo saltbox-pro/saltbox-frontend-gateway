@@ -2,7 +2,8 @@ import { createServerErrorMiddleware } from "@saltbox/saltbox-frontend-common";
 import { DiscoveryApi, Configuration } from "@saltbox/saltbox-gateway-api-client";
 import { computed, makeObservable, observable } from "mobx";
 
-import { appStore, envStore } from "saltbox-gateway/store";
+import { envStore } from "@shared/config";
+import { appStore } from "@shared/stores";
 
 class ApiGatewayStore {
   @observable serviceName: string;

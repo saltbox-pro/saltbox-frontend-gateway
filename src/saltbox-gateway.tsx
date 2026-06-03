@@ -3,10 +3,11 @@ import React from "react";
 import ReactDOMClient from "react-dom/client";
 import singleSpaReact from "single-spa-react";
 
-import { appStore, envStore } from "saltbox-gateway/store";
-import { i18nStore } from "saltbox-gateway/store/i18n-store";
+import { envStore } from "@shared/config";
+import { i18nStore } from "@shared/i18n";
+import { appStore } from "@shared/stores";
 
-import Root from "./root.component";
+import Root from "@/root.component";
 
 const lifecycles = singleSpaReact({
   React,
