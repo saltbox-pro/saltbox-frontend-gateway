@@ -46,6 +46,9 @@ type ServiceDetailsModalProps = {
   onToggle: (service: ServiceSchemaOutput) => void;
   onDelete: (service: ServiceSchemaOutput) => void;
   onDeleteInstance: (service: ServiceSchemaOutput, instanceId: string) => void;
+  isToggleLoading?: boolean;
+  isDeleteServiceLoading?: boolean;
+  isDeleteInstanceLoading?: boolean;
 };
 
 export const ServiceDetailsModal = ({
@@ -54,6 +57,9 @@ export const ServiceDetailsModal = ({
   onToggle,
   onDelete,
   onDeleteInstance,
+  isToggleLoading,
+  isDeleteServiceLoading,
+  isDeleteInstanceLoading,
 }: ServiceDetailsModalProps) => {
   const { t } = useTranslation();
   const [modal, contextHolder] = Modal.useModal();
@@ -123,12 +129,14 @@ export const ServiceDetailsModal = ({
                     key: "toggle",
                     label: service.enabled ? t("general.disable") : t("general.enable"),
                     className: styles.sectionTitleActionsToggle,
+                    disabled: isToggleLoading || isDeleteServiceLoading,
                     onClick: () => onToggle(service),
                   },
                   {
                     key: "delete",
                     label: t("general.delete-service"),
                     className: styles.sectionTitleActionsDelete,
+                    disabled: isToggleLoading || isDeleteServiceLoading,
                     onClick: () => {
                       modal.confirm({
                         title: t("general.delete-service"),
@@ -145,7 +153,10 @@ export const ServiceDetailsModal = ({
                 ],
               }}
             >
-              <Button icon={<SettingOutlined />} />
+              <Button
+                icon={<SettingOutlined />}
+                loading={isToggleLoading || isDeleteServiceLoading}
+              />
             </Dropdown>
           </div>
           <InfoDescriptions items={basicInfoItems} />
@@ -179,6 +190,7 @@ export const ServiceDetailsModal = ({
                   instance={instance}
                   isOnly={service.instances.length <= 1}
                   onDelete={() => onDeleteInstance(service, instance.id)}
+                  isDeleting={isDeleteInstanceLoading}
                 />
               </List.Item>
             )}

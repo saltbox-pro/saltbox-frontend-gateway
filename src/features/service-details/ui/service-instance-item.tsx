@@ -24,9 +24,15 @@ type ServiceInstanceItemProps = {
   instance: ServiceInstanceOutput;
   isOnly: boolean;
   onDelete: () => void;
+  isDeleting?: boolean;
 };
 
-export const ServiceInstanceItem = ({ instance, isOnly, onDelete }: ServiceInstanceItemProps) => {
+export const ServiceInstanceItem = ({
+  instance,
+  isOnly,
+  onDelete,
+  isDeleting,
+}: ServiceInstanceItemProps) => {
   const { t } = useTranslation();
 
   return (
@@ -85,7 +91,12 @@ export const ServiceInstanceItem = ({ instance, isOnly, onDelete }: ServiceInsta
           okText={t("general.yes")}
           cancelText={t("general.no")}
         >
-          <Button danger className={styles.instanceBtnDelete} disabled={isOnly}>
+          <Button
+            danger
+            className={styles.instanceBtnDelete}
+            disabled={isOnly || isDeleting}
+            loading={isDeleting}
+          >
             {t("general.delete")}
           </Button>
         </Popconfirm>
