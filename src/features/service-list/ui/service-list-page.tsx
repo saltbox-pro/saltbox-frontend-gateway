@@ -24,10 +24,10 @@ export const ServiceListPage = observer(() => {
   const handleToggle = useCallback(
     (service: ServiceSchemaOutput) => {
       modal.confirm({
-        title: service.enabled ? t("general.disableService") : t("general.enableService"),
+        title: service.enabled ? t("general.disable-service") : t("general.enable-service"),
         content: service.enabled
-          ? t("general.areYouSureDisableService")
-          : t("general.areYouSureEnableService"),
+          ? t("general.are-you-sure-disable-service")
+          : t("general.are-you-sure-enable-service"),
         okText: t("general.yes"),
         okType: "danger",
         cancelText: t("general.no"),

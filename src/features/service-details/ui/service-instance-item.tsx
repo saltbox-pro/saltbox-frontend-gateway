@@ -9,15 +9,15 @@ import styles from "./service-instance-item.module.css";
 const formatRelativeTime = (timestamp: number, t: TFunction): string => {
   const diff = Math.floor(Date.now() / 1000) - timestamp;
   if (diff < 60) {
-    return t("general.justNow");
+    return t("general.just-now");
   }
   if (diff < 3600) {
-    return t("general.minutesAgo", { n: Math.floor(diff / 60) });
+    return t("general.minutes-ago", { n: Math.floor(diff / 60) });
   }
   if (diff < 86400) {
-    return t("general.hoursAgo", { n: Math.floor(diff / 3600) });
+    return t("general.hours-ago", { n: Math.floor(diff / 3600) });
   }
-  return t("general.daysAgo", { n: Math.floor(diff / 86400) });
+  return t("general.days-ago", { n: Math.floor(diff / 86400) });
 };
 
 type ServiceInstanceItemProps = {
@@ -43,7 +43,7 @@ export const ServiceInstanceItem = ({ instance, isOnly, onDelete }: ServiceInsta
         </div>
         {instance.last_check && (
           <div className={styles.instanceTimestamp}>
-            {t("general.lastCheck")}: {new Date(instance.last_check * 1000).toLocaleString()}
+            {t("general.last-check")}: {new Date(instance.last_check * 1000).toLocaleString()}
             <span className={styles.instanceRelativeTime}>
               ({formatRelativeTime(instance.last_check, t)})
             </span>
@@ -51,7 +51,7 @@ export const ServiceInstanceItem = ({ instance, isOnly, onDelete }: ServiceInsta
         )}
         {instance.last_healthy && (
           <div className={styles.instanceTimestamp}>
-            {t("general.lastHealthy")}: {new Date(instance.last_healthy * 1000).toLocaleString()}
+            {t("general.last-healthy")}: {new Date(instance.last_healthy * 1000).toLocaleString()}
             <span className={styles.instanceRelativeTime}>
               ({formatRelativeTime(instance.last_healthy, t)})
             </span>
@@ -79,8 +79,8 @@ export const ServiceInstanceItem = ({ instance, isOnly, onDelete }: ServiceInsta
           </Flex>
         </Flex>
         <Popconfirm
-          title={t("general.deleteInstance")}
-          description={t("general.areYouSureDeleteInstance")}
+          title={t("general.delete-instance")}
+          description={t("general.are-you-sure-delete-instance")}
           onConfirm={onDelete}
           okText={t("general.yes")}
           cancelText={t("general.no")}

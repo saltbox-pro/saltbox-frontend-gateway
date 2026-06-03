@@ -71,7 +71,7 @@ export const ServiceCard = ({ service, onDetails, onChangeBalancing }: ServiceCa
             <Tag color={SERVICE_TYPE_COLORS[service.type]}>
               {service.type === ServiceSchemaOutputTypeEnum.Official
                 ? t("general.official")
-                : t("general.thirdParty")}
+                : t("general.third-party")}
             </Tag>
           </div>
 
