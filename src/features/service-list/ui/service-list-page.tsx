@@ -16,6 +16,7 @@ export const ServiceListPage = observer(() => {
   const { t } = useTranslation();
   const [store] = useState(() => new ServicesStore());
   const [modal, contextHolder] = Modal.useModal();
+  const { isChangeBalancingLoading } = store;
 
   useEffect(() => {
     store.loadServices();
@@ -24,10 +25,10 @@ export const ServiceListPage = observer(() => {
   const handleToggle = useCallback(
     (service: ServiceSchemaOutput) => {
       modal.confirm({
-        title: service.enabled ? t("general.disableService") : t("general.enableService"),
+        title: service.enabled ? t("general.disable-service") : t("general.enable-service"),
         content: service.enabled
-          ? t("general.areYouSureDisableService")
-          : t("general.areYouSureEnableService"),
+          ? t("general.are-you-sure-disable-service")
+          : t("general.are-you-sure-enable-service"),
         okText: t("general.yes"),
         okType: "danger",
         cancelText: t("general.no"),
@@ -66,6 +67,7 @@ export const ServiceListPage = observer(() => {
               service={service}
               onDetails={store.setSelectedService}
               onChangeBalancing={store.changeBalancing}
+              isChangeBalancingLoading={isChangeBalancingLoading}
             />
           )}
         />
@@ -77,6 +79,9 @@ export const ServiceListPage = observer(() => {
             onToggle={handleToggle}
             onDelete={store.deleteService}
             onDeleteInstance={store.deleteInstance}
+            isToggleLoading={store.isToggleLoading}
+            isDeleteServiceLoading={store.isDeleteServiceLoading}
+            isDeleteInstanceLoading={store.isDeleteInstanceLoading}
           />
         )}
       </div>

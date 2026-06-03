@@ -46,6 +46,9 @@ type ServiceDetailsModalProps = {
   onToggle: (service: ServiceSchemaOutput) => void;
   onDelete: (service: ServiceSchemaOutput) => void;
   onDeleteInstance: (service: ServiceSchemaOutput, instanceId: string) => void;
+  isToggleLoading?: boolean;
+  isDeleteServiceLoading?: boolean;
+  isDeleteInstanceLoading?: boolean;
 };
 
 export const ServiceDetailsModal = ({
@@ -54,6 +57,9 @@ export const ServiceDetailsModal = ({
   onToggle,
   onDelete,
   onDeleteInstance,
+  isToggleLoading,
+  isDeleteServiceLoading,
+  isDeleteInstanceLoading,
 }: ServiceDetailsModalProps) => {
   const { t } = useTranslation();
   const [modal, contextHolder] = Modal.useModal();
@@ -61,7 +67,7 @@ export const ServiceDetailsModal = ({
   const basicInfoItems = [
     {
       key: "name",
-      label: t("general.serviceName"),
+      label: t("general.service-name"),
       children: <Tag>{service.name}</Tag>,
     },
     {
@@ -71,7 +77,7 @@ export const ServiceDetailsModal = ({
         <Tag color={SERVICE_TYPE_COLORS[service.type]}>
           {service.type === ServiceSchemaOutputTypeEnum.Official
             ? t("general.official")
-            : t("general.thirdParty")}
+            : t("general.third-party")}
         </Tag>
       ),
     },
@@ -113,7 +119,7 @@ export const ServiceDetailsModal = ({
       >
         <div className={styles.section}>
           <div className={styles.sectionTitle}>
-            <Typography.Text strong>{t("general.basicInfo")}</Typography.Text>
+            <Typography.Text strong>{t("general.basic-info")}</Typography.Text>
             <Dropdown
               trigger={["click"]}
               placement="bottomRight"
@@ -123,16 +129,18 @@ export const ServiceDetailsModal = ({
                     key: "toggle",
                     label: service.enabled ? t("general.disable") : t("general.enable"),
                     className: styles.sectionTitleActionsToggle,
+                    disabled: isToggleLoading || isDeleteServiceLoading,
                     onClick: () => onToggle(service),
                   },
                   {
                     key: "delete",
-                    label: t("general.deleteService"),
+                    label: t("general.delete-service"),
                     className: styles.sectionTitleActionsDelete,
+                    disabled: isToggleLoading || isDeleteServiceLoading,
                     onClick: () => {
                       modal.confirm({
-                        title: t("general.deleteService"),
-                        content: t("general.areYouSureDeleteService"),
+                        title: t("general.delete-service"),
+                        content: t("general.are-you-sure-delete-service"),
                         okText: t("general.yes"),
                         okType: "danger",
                         cancelText: t("general.no"),
@@ -145,7 +153,10 @@ export const ServiceDetailsModal = ({
                 ],
               }}
             >
-              <Button icon={<SettingOutlined />} />
+              <Button
+                icon={<SettingOutlined />}
+                loading={isToggleLoading || isDeleteServiceLoading}
+              />
             </Dropdown>
           </div>
           <InfoDescriptions items={basicInfoItems} />
@@ -167,7 +178,7 @@ export const ServiceDetailsModal = ({
             <div className={styles.sectionTitleGroup}>
               <NodeIndexOutlined />
               <Typography.Text strong>
-                {t("general.instancesCount", { count: service.instances.length })}
+                {t("general.instances-count", { count: service.instances.length })}
               </Typography.Text>
             </div>
           </div>
@@ -179,6 +190,7 @@ export const ServiceDetailsModal = ({
                   instance={instance}
                   isOnly={service.instances.length <= 1}
                   onDelete={() => onDeleteInstance(service, instance.id)}
+                  isDeleting={isDeleteInstanceLoading}
                 />
               </List.Item>
             )}

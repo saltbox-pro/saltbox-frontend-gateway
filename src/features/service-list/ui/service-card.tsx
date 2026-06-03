@@ -45,9 +45,15 @@ export type ServiceCardProps = {
   service: ServiceSchemaOutput;
   onDetails: (service: ServiceSchemaOutput) => void;
   onChangeBalancing: (service: ServiceSchemaOutput, strategy: ProxyBalancingStrategy) => void;
+  isChangeBalancingLoading?: boolean;
 };
 
-export const ServiceCard = ({ service, onDetails, onChangeBalancing }: ServiceCardProps) => {
+export const ServiceCard = ({
+  service,
+  onDetails,
+  onChangeBalancing,
+  isChangeBalancingLoading,
+}: ServiceCardProps) => {
   const { t } = useTranslation();
   const healthyInstanceCount = service.instances.filter((i) => i.healthy).length;
   const totalInstance = service.instances.length;
@@ -71,7 +77,7 @@ export const ServiceCard = ({ service, onDetails, onChangeBalancing }: ServiceCa
             <Tag color={SERVICE_TYPE_COLORS[service.type]}>
               {service.type === ServiceSchemaOutputTypeEnum.Official
                 ? t("general.official")
-                : t("general.thirdParty")}
+                : t("general.third-party")}
             </Tag>
           </div>
 
@@ -112,7 +118,8 @@ export const ServiceCard = ({ service, onDetails, onChangeBalancing }: ServiceCa
               size="small"
               value={service.load_balancing_strategy ?? ProxyBalancingStrategy.Rr}
               options={BALANCING_OPTIONS}
-              disabled={totalInstance <= 1}
+              disabled={totalInstance <= 1 || isChangeBalancingLoading}
+              loading={isChangeBalancingLoading}
               onChange={(val) => onChangeBalancing(service, val)}
             />
           </div>
