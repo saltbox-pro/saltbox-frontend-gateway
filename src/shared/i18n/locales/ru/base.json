@@ -37,6 +37,9 @@
     "areYouSureDisableService": "Вы уверены, что хотите отключить этот сервис?",
     "areYouSureEnableService": "Вы уверены, что хотите включить этот сервис?",
     "yes": "Да",
-    "no": "Нет"
+    "no": "Нет",
+    "endpoints-count": "Эндпоинты ({{count}})",
+    "opa-action": "Действие",
+    "opa-policy": "Политика"
   }
 }

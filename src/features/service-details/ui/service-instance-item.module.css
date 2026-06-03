@@ -1,12 +1,20 @@
+.instanceCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+  padding: 8px 4px;
+  background-color: #fafafa;
+  border-radius: var(--ant-border-radius, 6px);
+  border-left: 4px solid var(--ant-color-split, #f0f0f0);
+}
+
 .instanceRow {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   width: 100%;
-  padding: 8px;
-  background-color: #fafafa;
-  border-radius: var(--ant-border-radius, 6px);
-  border-left: 4px solid var(--ant-color-split, #f0f0f0);
+  padding: 0 4px;
 }
 
 .instanceInfo {
@@ -82,4 +90,81 @@
 .instanceBtnDelete:disabled {
   background-color: transparent !important;
   color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45)) !important;
+}
+
+.endpointsCollapse {
+  margin-top: 4px;
+}
+
+.endpointsCollapse :global(.ant-collapse-content-box) {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.endpointsSectionList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.endpointItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: var(--ant-border-radius, 6px);
+  color: var(--ant-color-text-primary, rgba(0, 0, 0, 0.88)) !important;
+}
+
+.endpointTopRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.endpointMethodTag {
+  font-weight: 600;
+  margin: 0;
+}
+
+.endpointPath {
+  font-size: 13px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.endpointCacheInfo {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45));
+  white-space: nowrap;
+}
+
+.endpointSummary {
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ant-color-text-secondary, rgba(0, 0, 0, 0.45));
+}
+
+.endpointDescription {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.endpointOpa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.endpointOpaLabel {
+  font-size: 12px;
+}
+
+.endpointOpaTag {
+  font-size: 11px !important;
+  margin: 0 !important;
 }

@@ -1,10 +1,20 @@
 import { GlobalOutlined } from "@ant-design/icons";
 import { ServiceInstanceOutput } from "@saltbox/saltbox-gateway-api-client";
-import { Badge, Button, Flex, Popconfirm, Typography } from "antd";
+import { Badge, Button, Collapse, Flex, Popconfirm, Tag, Typography } from "antd";
 import { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 
 import styles from "./service-instance-item.module.css";
+
+const METHOD_COLORS: Record<string, string> = {
+  GET: "blue",
+  POST: "green",
+  PUT: "orange",
+  DELETE: "red",
+  PATCH: "gold",
+  HEAD: "purple",
+  OPTIONS: "default",
+};
 
 const formatRelativeTime = (timestamp: number, t: TFunction): string => {
   const diff = Math.floor(Date.now() / 1000) - timestamp;
@@ -30,66 +40,129 @@ export const ServiceInstanceItem = ({ instance, isOnly, onDelete }: ServiceInsta
   const { t } = useTranslation();
 
   return (
-    <div className={styles.instanceRow}>
-      <div className={styles.instanceInfo}>
-        <div className={styles.instanceTitleRow}>
-          <GlobalOutlined className={styles.instanceIcon} />
-          <div>
-            <div className={styles.instanceId}>(id: {instance.id})</div>
-            <div className={styles.instanceHost}>
-              {instance.host}:{instance.port}
+    <div className={styles.instanceCard}>
+      <div className={styles.instanceRow}>
+        <div className={styles.instanceInfo}>
+          <div className={styles.instanceTitleRow}>
+            <GlobalOutlined className={styles.instanceIcon} />
+            <div>
+              <div className={styles.instanceId}>(id: {instance.id})</div>
+              <div className={styles.instanceHost}>
+                {instance.host}:{instance.port}
+              </div>
             </div>
           </div>
+          {instance.last_check && (
+            <div className={styles.instanceTimestamp}>
+              {t("general.lastCheck")}: {new Date(instance.last_check * 1000).toLocaleString()}
+              <span className={styles.instanceRelativeTime}>
+                ({formatRelativeTime(instance.last_check, t)})
+              </span>
+            </div>
+          )}
+          {instance.last_healthy && (
+            <div className={styles.instanceTimestamp}>
+              {t("general.lastHealthy")}: {new Date(instance.last_healthy * 1000).toLocaleString()}
+              <span className={styles.instanceRelativeTime}>
+                ({formatRelativeTime(instance.last_healthy, t)})
+              </span>
+            </div>
+          )}
         </div>
-        {instance.last_check && (
-          <div className={styles.instanceTimestamp}>
-            {t("general.lastCheck")}: {new Date(instance.last_check * 1000).toLocaleString()}
-            <span className={styles.instanceRelativeTime}>
-              ({formatRelativeTime(instance.last_check, t)})
-            </span>
-          </div>
-        )}
-        {instance.last_healthy && (
-          <div className={styles.instanceTimestamp}>
-            {t("general.lastHealthy")}: {new Date(instance.last_healthy * 1000).toLocaleString()}
-            <span className={styles.instanceRelativeTime}>
-              ({formatRelativeTime(instance.last_healthy, t)})
-            </span>
-          </div>
-        )}
+
+        <div className={styles.instanceExtraInfo}>
+          <Flex align="center" gap={8}>
+            <Badge
+              status={instance.healthy ? "success" : "error"}
+              text={
+                <span
+                  className={
+                    instance.healthy ? styles.instanceHealthyStatus : styles.instanceUnhealthyStatus
+                  }
+                >
+                  {instance.healthy ? t("general.healthy") : t("general.unhealthy")}
+                </span>
+              }
+            />
+            <Flex align="center" gap={4}>
+              <Typography.Text type="secondary">API:</Typography.Text>
+              <Typography.Text>{instance.version ?? t("general.na")}</Typography.Text>
+            </Flex>
+          </Flex>
+          <Popconfirm
+            title={t("general.deleteInstance")}
+            description={t("general.areYouSureDeleteInstance")}
+            onConfirm={onDelete}
+            okText={t("general.yes")}
+            cancelText={t("general.no")}
+          >
+            <Button danger className={styles.instanceBtnDelete} disabled={isOnly}>
+              {t("general.delete")}
+            </Button>
+          </Popconfirm>
+        </div>
       </div>
 
-      <div className={styles.instanceExtraInfo}>
-        <Flex align="center" gap={8}>
-          <Badge
-            status={instance.healthy ? "success" : "error"}
-            text={
-              <span
-                className={
-                  instance.healthy ? styles.instanceHealthyStatus : styles.instanceUnhealthyStatus
-                }
-              >
-                {instance.healthy ? t("general.healthy") : t("general.unhealthy")}
-              </span>
-            }
-          />
-          <Flex align="center" gap={4}>
-            <Typography.Text type="secondary">API:</Typography.Text>
-            <Typography.Text>{instance.version ?? t("general.na")}</Typography.Text>
-          </Flex>
-        </Flex>
-        <Popconfirm
-          title={t("general.deleteInstance")}
-          description={t("general.areYouSureDeleteInstance")}
-          onConfirm={onDelete}
-          okText={t("general.yes")}
-          cancelText={t("general.no")}
-        >
-          <Button danger className={styles.instanceBtnDelete} disabled={isOnly}>
-            {t("general.delete")}
-          </Button>
-        </Popconfirm>
-      </div>
+      {(instance.endpoints?.length ?? 0) > 0 && (
+        <Collapse
+          size="small"
+          className={styles.endpointsCollapse}
+          items={[
+            {
+              key: "endpoints",
+              label: t("general.endpoints-count", { count: instance.endpoints!.length }),
+              children: (
+                <div className={styles.endpointsSectionList}>
+                  {instance.endpoints!.map((endpoint, idx) => (
+                    <Tag
+                      color={METHOD_COLORS[endpoint.method.toUpperCase()] ?? "default"}
+                      key={idx}
+                      className={styles.endpointItem}
+                    >
+                      <div className={styles.endpointTopRow}>
+                        <Tag
+                          color={METHOD_COLORS[endpoint.method.toUpperCase()] ?? "default"}
+                          className={styles.endpointMethodTag}
+                        >
+                          {endpoint.method.toUpperCase()}
+                        </Tag>
+                        <code className={styles.endpointPath}>{endpoint.path}</code>
+                        <span className={styles.endpointCacheInfo}>
+                          {endpoint.cache_ttl ? `${endpoint.cache_ttl}s cache` : "No cache"}
+                        </span>
+                      </div>
+                      {endpoint.summary && (
+                        <div className={styles.endpointSummary}>{endpoint.summary}</div>
+                      )}
+                      {endpoint.description && (
+                        <div className={styles.endpointDescription}>{endpoint.description}</div>
+                      )}
+                      {(!endpoint.opa_config?.x_opa_action ||
+                        endpoint.opa_config?.x_opa_policy) && (
+                        <div className={styles.endpointOpa}>
+                          <Typography.Text className={styles.endpointOpaLabel}>
+                            OPA:
+                          </Typography.Text>
+                          {!endpoint.opa_config.x_opa_action && (
+                            <Tag className={styles.endpointOpaTag}>
+                              {t("general.opa-action")}: {endpoint.opa_config.x_opa_action}
+                            </Tag>
+                          )}
+                          {!endpoint.opa_config.x_opa_policy && (
+                            <Tag className={styles.endpointOpaTag}>
+                              {t("general.opa-policy")}: {endpoint.opa_config.x_opa_policy}
+                            </Tag>
+                          )}
+                        </div>
+                      )}
+                    </Tag>
+                  ))}
+                </div>
+              ),
+            },
+          ]}
+        />
+      )}
     </div>
   );
 };

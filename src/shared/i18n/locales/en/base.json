@@ -37,6 +37,9 @@
     "areYouSureDisableService": "Are you sure you want to disable this service?",
     "areYouSureEnableService": "Are you sure you want to enable this service?",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "endpoints-count": "Endpoints ({{count}})",
+    "opa-action": "Action",
+    "opa-policy": "Policy"
   }
 }
