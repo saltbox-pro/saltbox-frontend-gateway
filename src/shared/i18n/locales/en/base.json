@@ -40,6 +40,11 @@
     "no": "No",
     "endpoints-count": "Endpoints ({{count}})",
     "opa-action": "Action",
-    "opa-policy": "Policy"
+    "opa-policy": "Policy",
+    "load-services-failed": "Failed to load services",
+    "toggle-service-failed": "Failed to toggle service state",
+    "delete-service-failed": "Failed to delete service",
+    "delete-instance-failed": "Failed to delete instance",
+    "change-balancing-failed": "Failed to change balancing strategy"
   }
 }

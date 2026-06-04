@@ -4,15 +4,24 @@ import { action, makeObservable, observable, runInAction } from "mobx";
 import { apiGatewayStore } from "@shared/api";
 
 export class ServicesStore {
-  @observable isLoading = false;
-  @observable isToggleLoading = false;
-  @observable isDeleteServiceLoading = false;
-  @observable isDeleteInstanceLoading = false;
-  @observable isChangeBalancingLoading = false;
-  @observable services: ServiceSchemaOutput[] = [];
-  @observable selectedService: ServiceSchemaOutput | null = null;
+  @observable isLoading: boolean;
+  @observable isToggleLoading: boolean;
+  @observable isDeleteServiceLoading: boolean;
+  @observable isDeleteInstanceLoading: boolean;
+  @observable isChangeBalancingLoading: boolean;
+  @observable services: ServiceSchemaOutput[];
+  @observable selectedService: ServiceSchemaOutput | null;
+  @observable error: string | null;
 
   constructor() {
+    this.isLoading = false;
+    this.isToggleLoading = false;
+    this.isDeleteServiceLoading = false;
+    this.isDeleteInstanceLoading = false;
+    this.isChangeBalancingLoading = false;
+    this.services = [];
+    this.selectedService = null;
+    this.error = null;
     makeObservable(this);
   }
 
@@ -32,6 +41,7 @@ export class ServicesStore {
       .catch(() => {
         runInAction(() => {
           this.isLoading = false;
+          this.error = "general.load-services-failed";
         });
       });
   };
@@ -48,8 +58,10 @@ export class ServicesStore {
         }
       );
       this.loadServices();
-    } catch (error) {
-      console.error(error);
+    } catch {
+      runInAction(() => {
+        this.error = "general.toggle-service-failed";
+      });
     } finally {
       runInAction(() => {
         this.isToggleLoading = false;
@@ -67,8 +79,10 @@ export class ServicesStore {
         this.selectedService = null;
       });
       this.loadServices();
-    } catch (error) {
-      console.error(error);
+    } catch {
+      runInAction(() => {
+        this.error = "general.delete-service-failed";
+      });
     } finally {
       runInAction(() => {
         this.isDeleteServiceLoading = false;
@@ -89,8 +103,10 @@ export class ServicesStore {
         }
       );
       this.loadServices();
-    } catch (error) {
-      console.error(error);
+    } catch {
+      runInAction(() => {
+        this.error = "general.delete-instance-failed";
+      });
     } finally {
       runInAction(() => {
         this.isDeleteInstanceLoading = false;
@@ -113,8 +129,10 @@ export class ServicesStore {
         }
       );
       this.loadServices();
-    } catch (error) {
-      console.error(error);
+    } catch {
+      runInAction(() => {
+        this.error = "general.change-balancing-failed";
+      });
     } finally {
       runInAction(() => {
         this.isChangeBalancingLoading = false;
@@ -124,5 +142,9 @@ export class ServicesStore {
 
   @action setSelectedService = (service: ServiceSchemaOutput | null) => {
     this.selectedService = service;
+  };
+
+  @action resetError = () => {
+    this.error = null;
   };
 }

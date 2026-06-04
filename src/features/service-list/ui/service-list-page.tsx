@@ -1,7 +1,7 @@
 import { SyncOutlined } from "@ant-design/icons";
 import { Modal, PageHeader } from "@saltbox/saltbox-frontend-common";
 import { ServiceSchemaOutput } from "@saltbox/saltbox-gateway-api-client";
-import { Button, List } from "antd";
+import { Button, List, message } from "antd";
 import { observer } from "mobx-react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -16,11 +16,19 @@ export const ServiceListPage = observer(() => {
   const { t } = useTranslation();
   const [store] = useState(() => new ServicesStore());
   const [modal, contextHolder] = Modal.useModal();
+  const [messageApi, messageContextHolder] = message.useMessage();
   const { isChangeBalancingLoading } = store;
 
   useEffect(() => {
     store.loadServices();
   }, [store]);
+
+  useEffect(() => {
+    if (store.error) {
+      messageApi.error(t(store.error));
+      store.resetError();
+    }
+  }, [messageApi, store, store.error, t]);
 
   const handleToggle = useCallback(
     (service: ServiceSchemaOutput) => {
@@ -43,6 +51,7 @@ export const ServiceListPage = observer(() => {
   return (
     <>
       {contextHolder}
+      {messageContextHolder}
 
       <PageHeader title={t("general.title")} />
 
