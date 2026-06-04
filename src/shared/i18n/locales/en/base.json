@@ -37,6 +37,11 @@
     "are-you-sure-disable-service": "Are you sure you want to disable this service?",
     "are-you-sure-enable-service": "Are you sure you want to enable this service?",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "load-services-failed": "Failed to load services",
+    "toggle-service-failed": "Failed to toggle service state",
+    "delete-service-failed": "Failed to delete service",
+    "delete-instance-failed": "Failed to delete instance",
+    "change-balancing-failed": "Failed to change balancing strategy"
   }
 }

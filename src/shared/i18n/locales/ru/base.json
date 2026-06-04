@@ -37,6 +37,11 @@
     "are-you-sure-disable-service": "Вы уверены, что хотите отключить этот сервис?",
     "are-you-sure-enable-service": "Вы уверены, что хотите включить этот сервис?",
     "yes": "Да",
-    "no": "Нет"
+    "no": "Нет",
+    "load-services-failed": "Не удалось загрузить список сервисов",
+    "toggle-service-failed": "Не удалось изменить состояние сервиса",
+    "delete-service-failed": "Не удалось удалить сервис",
+    "delete-instance-failed": "Не удалось удалить инстанс",
+    "change-balancing-failed": "Не удалось изменить стратегию балансировки"
   }
 }
