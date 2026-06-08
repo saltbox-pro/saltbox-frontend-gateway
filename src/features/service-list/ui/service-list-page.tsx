@@ -37,9 +37,8 @@ export const ServiceListPage = observer(() => {
         content: service.enabled
           ? t("general.are-you-sure-disable-service")
           : t("general.are-you-sure-enable-service"),
-        okText: t("general.yes"),
-        okType: "danger",
-        cancelText: t("general.no"),
+        okText: t("general.confirm"),
+        cancelText: t("general.cancel"),
         onOk() {
           store.toggleService(service);
         },

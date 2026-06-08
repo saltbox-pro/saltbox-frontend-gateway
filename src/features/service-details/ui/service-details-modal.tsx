@@ -141,9 +141,13 @@ export const ServiceDetailsModal = ({
                       modal.confirm({
                         title: t("general.delete-service"),
                         content: t("general.are-you-sure-delete-service"),
-                        okText: t("general.yes"),
+                        okText: t("general.delete"),
                         okType: "danger",
-                        cancelText: t("general.no"),
+                        okButtonProps: {
+                          danger: true,
+                          type: "primary",
+                        },
+                        cancelText: t("general.cancel"),
                         onOk() {
                           onDelete(service);
                         },
