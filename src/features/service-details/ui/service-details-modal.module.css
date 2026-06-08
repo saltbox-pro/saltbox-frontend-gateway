@@ -35,7 +35,7 @@
 }
 
 .sectionTitleActionsDelete {
-  color: #ff4d4f !important;
+  color: var(--ant-color-error, #ff4d4f) !important;
 }
 
 .sectionTitleActionsDelete:hover {
