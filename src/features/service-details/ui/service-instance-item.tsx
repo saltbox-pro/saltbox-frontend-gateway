@@ -90,10 +90,10 @@ export const ServiceInstanceItem = ({
                 </span>
               }
             />
-            <Flex align="center" gap={4}>
+            {/* <Flex align="center" gap={4}>
               <Typography.Text type="secondary">API:</Typography.Text>
               <Typography.Text>{instance.version ?? t("general.na")}</Typography.Text>
-            </Flex>
+            </Flex> */}
           </Flex>
           <Popconfirm
             title={t("general.delete-instance")}
