@@ -1,3 +1,4 @@
+import { createSingleSpaErrorBoundary } from "@saltbox/saltbox-frontend-common";
 import { autorun, runInAction } from "mobx";
 import React from "react";
 import ReactDOMClient from "react-dom/client";
@@ -13,6 +14,7 @@ const lifecycles = singleSpaReact({
   React,
   ReactDOMClient,
   rootComponent: Root,
+  errorBoundary: createSingleSpaErrorBoundary("Gateway"),
   domElementGetter: () => document.getElementById("app-container"),
 });
 
