@@ -1,4 +1,3 @@
-import { createServerErrorMiddleware } from "@saltbox/saltbox-frontend-common";
 import { DiscoveryApi, Configuration } from "@saltbox/saltbox-gateway-api-client";
 import { computed, makeObservable, observable } from "mobx";
 
@@ -17,7 +16,6 @@ class ApiGatewayStore {
       headers: {
         Authorization: `Bearer ${appStore.authStore.user.access_token}`,
       },
-      middleware: [createServerErrorMiddleware()],
     });
   }
 
