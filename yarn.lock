@@ -1796,10 +1796,10 @@
     react-querybuilder "^8.11.1"
     react-transition-group "^4.4.5"
 
-"@saltbox/saltbox-gateway-api-client@^0.2.1-030a37a9756d4952476accb527e5e07b18a98950":
-  version "0.2.1-030a37a9756d4952476accb527e5e07b18a98950"
-  resolved "https://dev.saltbox.pro/api/v4/projects/44/packages/npm/@saltbox/saltbox-gateway-api-client/-/@saltbox/saltbox-gateway-api-client-0.2.1-030a37a9756d4952476accb527e5e07b18a98950.tgz#cf31afe2bab586e723c399ab642c3f9c632edc77"
-  integrity sha1-zzGv4rq1hucjw5mrZCw/nGMu3Hc=
+"@saltbox/saltbox-gateway-api-client@0.3.0-e40d7169b74d719e1fe798d11364768c99f85a76":
+  version "0.3.0-e40d7169b74d719e1fe798d11364768c99f85a76"
+  resolved "https://dev.saltbox.pro/api/v4/projects/44/packages/npm/@saltbox/saltbox-gateway-api-client/-/@saltbox/saltbox-gateway-api-client-0.3.0-e40d7169b74d719e1fe798d11364768c99f85a76.tgz#736059ddb8de0d6415dd86d13d2287846606c2e0"
+  integrity sha1-c2BZ3bjeDWQV3YbRPSKHhGYGwuA=
 
 "@sinonjs/commons@^1.7.0":
   version "1.8.6"

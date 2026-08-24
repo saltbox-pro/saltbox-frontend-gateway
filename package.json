@@ -62,7 +62,7 @@
     "@babel/plugin-proposal-class-properties": "7.18.6",
     "@babel/plugin-proposal-decorators": "7.28.0",
     "@saltbox/saltbox-frontend-common": "^0.4.3",
-    "@saltbox/saltbox-gateway-api-client": "^0.2.1-030a37a9756d4952476accb527e5e07b18a98950",
+    "@saltbox/saltbox-gateway-api-client": "0.3.0-e40d7169b74d719e1fe798d11364768c99f85a76",
     "antd": "^5.26.7",
     "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^7.1.2",
