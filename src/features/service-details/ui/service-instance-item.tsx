@@ -33,7 +33,7 @@ const formatRelativeTime = (timestamp: number, t: TFunction): string => {
 type ServiceInstanceItemProps = {
   instance: ServiceInstanceOutput;
   isOnly: boolean;
-  onDelete: () => void;
+  onDelete: () => void | Promise<unknown>;
   isDeleting?: boolean;
 };
 

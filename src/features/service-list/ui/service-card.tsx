@@ -44,7 +44,10 @@ const ServiceStatusTag = ({ service }: { service: ServiceSchemaOutput }) => {
 export type ServiceCardProps = {
   service: ServiceSchemaOutput;
   onDetails: (service: ServiceSchemaOutput) => void;
-  onChangeBalancing: (service: ServiceSchemaOutput, strategy: ProxyBalancingStrategy) => void;
+  onChangeBalancing: (
+    service: ServiceSchemaOutput,
+    strategy: ProxyBalancingStrategy
+  ) => void | Promise<unknown>;
   isChangeBalancingLoading?: boolean;
 };
 

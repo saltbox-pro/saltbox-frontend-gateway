@@ -8,9 +8,8 @@ import {
 import { Button, List, Tag, Typography } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { ServiceInstanceItem } from "./service-instance-item";
-
 import styles from "./service-details-modal.module.css";
+import { ServiceInstanceItem } from "./service-instance-item";
 
 const BALANCING_LABELS: Record<ProxyBalancingStrategy, string> = {
   [ProxyBalancingStrategy.Rand]: "Random",
@@ -44,11 +43,11 @@ type ServiceDetailsModalProps = {
   service: ServiceSchemaOutput;
   onClose: () => void;
   onToggle: (service: ServiceSchemaOutput) => void;
-  onDelete: (service: ServiceSchemaOutput) => void;
-  onDeleteInstance: (service: ServiceSchemaOutput, instanceId: string) => void;
+  onDelete: (service: ServiceSchemaOutput) => void | Promise<unknown>;
+  onDeleteInstance: (service: ServiceSchemaOutput, instanceId: string) => void | Promise<unknown>;
   isToggleLoading?: boolean;
   isDeleteServiceLoading?: boolean;
-  isDeleteInstanceLoading?: boolean;
+  isInstanceDeleting?: (instanceId: string) => boolean;
 };
 
 export const ServiceDetailsModal = ({
@@ -59,7 +58,7 @@ export const ServiceDetailsModal = ({
   onDeleteInstance,
   isToggleLoading,
   isDeleteServiceLoading,
-  isDeleteInstanceLoading,
+  isInstanceDeleting,
 }: ServiceDetailsModalProps) => {
   const { t } = useTranslation();
   const [modal, contextHolder] = Modal.useModal();
@@ -149,7 +148,7 @@ export const ServiceDetailsModal = ({
                         },
                         cancelText: t("general.cancel"),
                         onOk() {
-                          onDelete(service);
+                          return onDelete(service);
                         },
                       });
                     },
@@ -194,7 +193,7 @@ export const ServiceDetailsModal = ({
                   instance={instance}
                   isOnly={service.instances.length <= 1}
                   onDelete={() => onDeleteInstance(service, instance.id)}
-                  isDeleting={isDeleteInstanceLoading}
+                  isDeleting={isInstanceDeleting?.(instance.id)}
                 />
               </List.Item>
             )}

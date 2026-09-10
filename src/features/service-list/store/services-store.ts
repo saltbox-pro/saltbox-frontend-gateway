@@ -1,67 +1,78 @@
+import { createLoader } from "@saltbox/saltbox-frontend-common";
 import { ProxyBalancingStrategy, ServiceSchemaOutput } from "@saltbox/saltbox-gateway-api-client";
-import { action, makeObservable, observable, runInAction } from "mobx";
+import { action, computed, makeObservable, observable, ObservableSet, runInAction } from "mobx";
 
 import { apiGatewayStore } from "@shared/api";
 
+function instanceLoadingKey(serviceName: string, instanceId: string): string {
+  return `${serviceName}:${instanceId}`;
+}
+
 export class ServicesStore {
-  @observable isLoading: boolean;
   @observable isToggleLoading: boolean;
   @observable isDeleteServiceLoading: boolean;
-  @observable isDeleteInstanceLoading: boolean;
-  @observable isChangeBalancingLoading: boolean;
+  @observable balancingLoadingByService: ObservableSet<string>;
+  @observable deletingInstanceKeys: ObservableSet<string>;
   @observable services: ServiceSchemaOutput[];
   @observable selectedService: ServiceSchemaOutput | null;
-  @observable error: string | null;
+
+  readonly servicesLoad = createLoader({
+    run: () => apiGatewayStore.discoveryApi?.getServicesApiDiscoveryServicesGet(),
+    onSuccess: (serv) => {
+      this.services = serv;
+      this.selectedService = this.selectedService
+        ? (serv.find((s) => s.name === this.selectedService!.name) ?? null)
+        : null;
+    },
+  });
 
   constructor() {
-    this.isLoading = false;
     this.isToggleLoading = false;
     this.isDeleteServiceLoading = false;
-    this.isDeleteInstanceLoading = false;
-    this.isChangeBalancingLoading = false;
+    this.balancingLoadingByService = observable.set();
+    this.deletingInstanceKeys = observable.set();
     this.services = [];
     this.selectedService = null;
-    this.error = null;
     makeObservable(this);
   }
 
-  @action loadServices = () => {
-    this.isLoading = true;
-    apiGatewayStore.discoveryApi
-      ?.getServicesApiDiscoveryServicesGet()
-      .then((serv) => {
-        runInAction(() => {
-          this.services = serv;
-          this.selectedService = this.selectedService
-            ? (serv.find((s) => s.name === this.selectedService!.name) ?? null)
-            : null;
-          this.isLoading = false;
-        });
-      })
-      .catch(() => {
-        runInAction(() => {
-          this.isLoading = false;
-          this.error = "general.load-services-failed";
-        });
-      });
+  @computed get isLoading(): boolean {
+    return this.servicesLoad.isLoading;
+  }
+
+  isBalancingLoading = (serviceName: string): boolean => {
+    return this.balancingLoadingByService.has(serviceName);
+  };
+
+  isInstanceDeleting = (serviceName: string, instanceId: string): boolean => {
+    return this.deletingInstanceKeys.has(instanceLoadingKey(serviceName, instanceId));
+  };
+
+  loadServices = () => {
+    this.servicesLoad.run().catch(() => undefined);
   };
 
   @action toggleService = async (service: ServiceSchemaOutput): Promise<void> => {
     this.isToggleLoading = true;
-    try {
-      await apiGatewayStore.discoveryApi?.enableDisableServiceApiDiscoveryServicesServiceNameTogglePost(
-        {
-          service_name: service.name,
-          BodyEnableDisableServiceApiDiscoveryServicesServiceNameTogglePost: {
-            enabled: !service.enabled,
-          },
-        }
-      );
-      this.loadServices();
-    } catch {
-      runInAction(() => {
-        this.error = "general.toggle-service-failed";
+
+    const request =
+      apiGatewayStore.discoveryApi?.enableDisableServiceApiDiscoveryServicesServiceNameTogglePost({
+        service_name: service.name,
+        BodyEnableDisableServiceApiDiscoveryServicesServiceNameTogglePost: {
+          enabled: !service.enabled,
+        },
       });
+
+    if (!request) {
+      runInAction(() => {
+        this.isToggleLoading = false;
+      });
+      return Promise.reject(new Error("Failed to toggle service"));
+    }
+
+    try {
+      await request;
+      this.loadServices();
     } finally {
       runInAction(() => {
         this.isToggleLoading = false;
@@ -71,18 +82,25 @@ export class ServicesStore {
 
   @action deleteService = async (service: ServiceSchemaOutput): Promise<void> => {
     this.isDeleteServiceLoading = true;
-    try {
-      await apiGatewayStore.discoveryApi?.removeServiceApiDiscoveryUnregisterServiceNameDelete({
+
+    const request =
+      apiGatewayStore.discoveryApi?.removeServiceApiDiscoveryUnregisterServiceNameDelete({
         service_name: service.name,
       });
+
+    if (!request) {
+      runInAction(() => {
+        this.isDeleteServiceLoading = false;
+      });
+      return Promise.reject(new Error("Failed to delete service"));
+    }
+
+    try {
+      await request;
       runInAction(() => {
         this.selectedService = null;
       });
       this.loadServices();
-    } catch {
-      runInAction(() => {
-        this.error = "general.delete-service-failed";
-      });
     } finally {
       runInAction(() => {
         this.isDeleteServiceLoading = false;
@@ -94,22 +112,30 @@ export class ServicesStore {
     service: ServiceSchemaOutput,
     instanceId: string
   ): Promise<void> => {
-    this.isDeleteInstanceLoading = true;
-    try {
-      await apiGatewayStore.discoveryApi?.removeInstanceApiDiscoveryUnregisterServiceNameInstanceIdDelete(
+    const key = instanceLoadingKey(service.name, instanceId);
+    this.deletingInstanceKeys.add(key);
+
+    const request =
+      apiGatewayStore.discoveryApi?.removeInstanceApiDiscoveryUnregisterServiceNameInstanceIdDelete(
         {
           service_name: service.name,
           instance_id: instanceId,
         }
       );
-      this.loadServices();
-    } catch {
+
+    if (!request) {
       runInAction(() => {
-        this.error = "general.delete-instance-failed";
+        this.deletingInstanceKeys.delete(key);
       });
+      return Promise.reject(new Error("Failed to delete instance"));
+    }
+
+    try {
+      await request;
+      this.loadServices();
     } finally {
       runInAction(() => {
-        this.isDeleteInstanceLoading = false;
+        this.deletingInstanceKeys.delete(key);
       });
     }
   };
@@ -118,9 +144,10 @@ export class ServicesStore {
     service: ServiceSchemaOutput,
     strategy: ProxyBalancingStrategy
   ): Promise<void> => {
-    this.isChangeBalancingLoading = true;
-    try {
-      await apiGatewayStore.discoveryApi?.changeBalancingStrategyApiDiscoveryServicesServiceNameChangeStrategyPatch(
+    this.balancingLoadingByService.add(service.name);
+
+    const request =
+      apiGatewayStore.discoveryApi?.changeBalancingStrategyApiDiscoveryServicesServiceNameChangeStrategyPatch(
         {
           service_name: service.name,
           BodyChangeBalancingStrategyApiDiscoveryServicesServiceNameChangeStrategyPatch: {
@@ -128,23 +155,25 @@ export class ServicesStore {
           },
         }
       );
-      this.loadServices();
-    } catch {
+
+    if (!request) {
       runInAction(() => {
-        this.error = "general.change-balancing-failed";
+        this.balancingLoadingByService.delete(service.name);
       });
+      return Promise.reject(new Error("Failed to change balancing strategy"));
+    }
+
+    try {
+      await request;
+      this.loadServices();
     } finally {
       runInAction(() => {
-        this.isChangeBalancingLoading = false;
+        this.balancingLoadingByService.delete(service.name);
       });
     }
   };
 
   @action setSelectedService = (service: ServiceSchemaOutput | null) => {
     this.selectedService = service;
-  };
-
-  @action resetError = () => {
-    this.error = null;
   };
 }
