@@ -1,5 +1,5 @@
-import { HddOutlined, NodeIndexOutlined, SettingOutlined } from "@ant-design/icons";
-import { Dropdown, InfoDescriptions, Modal } from "@saltbox/saltbox-frontend-common";
+import { HddOutlined, NodeIndexOutlined } from "@ant-design/icons";
+import { InfoDescriptions, Modal, SettingsDropdown } from "@saltbox/saltbox-frontend-common";
 import {
   ProxyBalancingStrategy,
   ServiceSchemaOutput,
@@ -119,9 +119,9 @@ export const ServiceDetailsModal = ({
         <div className={styles.section}>
           <div className={styles.sectionTitle}>
             <Typography.Text strong>{t("general.basic-info")}</Typography.Text>
-            <Dropdown
-              trigger={["click"]}
+            <SettingsDropdown
               placement="bottomRight"
+              loading={isToggleLoading || isDeleteServiceLoading}
               menu={{
                 items: [
                   {
@@ -155,12 +155,7 @@ export const ServiceDetailsModal = ({
                   },
                 ],
               }}
-            >
-              <Button
-                icon={<SettingOutlined />}
-                loading={isToggleLoading || isDeleteServiceLoading}
-              />
-            </Dropdown>
+            />
           </div>
           <InfoDescriptions items={basicInfoItems} />
         </div>
