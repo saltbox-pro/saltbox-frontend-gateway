@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Migrated to localized API error handling: replaced `store.error`/`message`
+  with `createLoader`, `ErrorZone` and `runMutation`; per-entity loading
+  state for balancing and instance deletion.
+- Service details modal now uses the shared `SettingsDropdown` component.
+
+### Fixed
+- Wired module and route error boundaries.
+
 ## [0.1.0] - 2025-09-30
 
 ### Added
