@@ -44,6 +44,7 @@
     "toggle-service-failed": "Failed to toggle service state",
     "delete-service-failed": "Failed to delete service",
     "delete-instance-failed": "Failed to delete instance",
-    "change-balancing-failed": "Failed to change balancing strategy"
+    "change-balancing-failed": "Failed to change balancing strategy",
+    "modules-reloading": "The application will reload to apply module changes"
   }
 }

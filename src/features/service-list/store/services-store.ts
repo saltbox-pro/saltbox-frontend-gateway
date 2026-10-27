@@ -72,7 +72,6 @@ export class ServicesStore {
 
     try {
       await request;
-      this.loadServices();
     } finally {
       runInAction(() => {
         this.isToggleLoading = false;
@@ -100,7 +99,6 @@ export class ServicesStore {
       runInAction(() => {
         this.selectedService = null;
       });
-      this.loadServices();
     } finally {
       runInAction(() => {
         this.isDeleteServiceLoading = false;

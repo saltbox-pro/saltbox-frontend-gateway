@@ -1,5 +1,11 @@
 import { SyncOutlined } from "@ant-design/icons";
-import { ErrorZone, Modal, PageHeader, runMutation } from "@saltbox/saltbox-frontend-common";
+import {
+  ErrorZone,
+  Modal,
+  PageHeader,
+  notify,
+  runMutation,
+} from "@saltbox/saltbox-frontend-common";
 import { ProxyBalancingStrategy, ServiceSchemaOutput } from "@saltbox/saltbox-gateway-api-client";
 import { Button, List } from "antd";
 import { observer } from "mobx-react";
@@ -12,6 +18,20 @@ import { ServicesStore } from "../store/services-store";
 
 import { ServiceCard } from "./service-card";
 import styles from "./service-list-page.module.css";
+
+const MODULES_RELOAD_TOAST_DURATION_SEC = 3;
+
+const notifyModulesReloading = (title: string) => {
+  notify.info({
+    title,
+    durationSec: MODULES_RELOAD_TOAST_DURATION_SEC,
+    showProgress: true,
+    closable: false,
+    onClose: () => {
+      window.location.reload();
+    },
+  });
+};
 
 export const ServiceListPage = observer(() => {
   const { t } = useTranslation();
@@ -36,6 +56,7 @@ export const ServiceListPage = observer(() => {
     (service: ServiceSchemaOutput) => {
       modal.confirm({
         title: service.enabled ? t("general.disable-service") : t("general.enable-service"),
+        icon: null,
         content: service.enabled
           ? t("general.are-you-sure-disable-service")
           : t("general.are-you-sure-enable-service"),
@@ -45,6 +66,10 @@ export const ServiceListPage = observer(() => {
           return runMutation({
             run: () => store.toggleService(service),
             errorMessage: t("general.toggle-service-failed"),
+          }).then((result) => {
+            if (result.ok) {
+              notifyModulesReloading(t("general.modules-reloading"));
+            }
           });
         },
       });
@@ -57,6 +82,10 @@ export const ServiceListPage = observer(() => {
       return runMutation({
         run: () => store.deleteService(service),
         errorMessage: t("general.delete-service-failed"),
+      }).then((result) => {
+        if (result.ok) {
+          notifyModulesReloading(t("general.modules-reloading"));
+        }
       });
     },
     [store, t]

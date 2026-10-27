@@ -139,6 +139,7 @@ export const ServiceDetailsModal = ({
                     onClick: () => {
                       modal.confirm({
                         title: t("general.delete-service"),
+                        icon: null,
                         content: t("general.are-you-sure-delete-service"),
                         okText: t("general.delete"),
                         okType: "danger",
